@@ -1,1 +1,84 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+    margin: 0;
+}
+
+.mainPage {
+    padding: 0;
+}
+
+.mainHeader {
+    width: 100%;
+    height: 104px;
+    background-color: #54CC00;
+    padding: 0;
+    text-align: center;
+}
+
+.logoDiv {        
+    /*background-image: url('assets/img/nurai_logo.png');
+    background-repeat: no-repeat;
+    background-position: center; */
+    min-height: 40px;
+    padding-top: 15px;
+}
+
+.searchDiv {
+    background-color: #ffffff;
+    margin: auto;
+    width: 95%;
+    min-height: 37px;
+    border-radius: 30px;
+}
+
+.bannerAppContainer {
+    width: 100%;
+    background-color: #FFFFFF;
+    padding: 0;
+    text-align: center;
+}
+
+.bannerApp {
+    position: absolute;
+    width: 96%;
+    height: 152px;    
+    /*margin: auto;*/
+    margin-left: 2%;    
+    top: 125px;
+    background-color: #FF4401;    
+    border-radius: 100px;
+}
+
+.bannerApp p {    
+
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 23px;
+    text-align: center;    
+    color: #FFFFFF;
+    text-align: center;
+    top: 169px;
+}
+
+.bannerApp .setDesktopBtn {    
+    width: 80%;
+    height: 30px;        
+    background-color: #FEF401;
+    text-align: center;
+    margin: auto;
+    cursor: pointer;
+}
+
+.setDesktopBtn p {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 13px;
+    line-height: 15px;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 7px;
+    color: #1D1D1D;
+}
