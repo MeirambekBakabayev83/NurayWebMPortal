@@ -6,20 +6,14 @@
     <div class="searchDiv">
     </div>
   </div>
-
-  <div class="bannerAppContainer">
-    <div class="bannerApp">
-      <p>
-        Совершай покупки <br/>даже офф-лайн!!!
-      </p>
-
-      <div class="setDesktopBtn" (click)="installDesktopApp()">
-        <p>
-          Добавить приложение на главный экран
-        </p>
-      </div>
-    </div>
+  <div class="content">
+    <router-outlet></router-outlet>
   </div>  
-
-  <router-outlet></router-outlet>
+</div>
+<div class="footer">
+  <div class="row">
+    <div class="col-12">
+      TEST
+    </div>  
+  </div>
 </div>

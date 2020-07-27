@@ -1,0 +1,60 @@
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.4)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+<div class="bannerAppContainer">
+    <div class="bannerApp">
+      <p>
+        Совершай покупки <br/>даже офф-лайн!!!
+      </p>
+
+      <div class="setDesktopBtn" (click)="installDesktopApp()">
+        <p>
+          Добавить приложение на главный экран          
+        </p>
+      </div>
+    </div>
+</div> 
+
+<div class="mainPGContent">
+  <div *ngFor="let pg of productGroups">
+    <div style="margin-bottom: 25px;">
+      <div class="row" style="margin-bottom: 3px;">
+        <div class="col-6 mainPGList">
+          {{pg?.productGroupNameRus}}
+        </div>        
+        <div class="col-6 mainPGProductCount">
+          Смотреть все {{pg?.productsCount}}
+        </div>    
+      </div>    
+
+      <!-- Карусель товаров (начало) -->     
+      <owl-carousel-o [options]="customOptions">
+        <ng-container *ngFor="let products of pg.products; let i = index">
+          <ng-template carouselSlide id={{products.productId}}>
+            <div class="productContainer">
+              <div class="imgDiv">
+                <img src="assets/img/orange.png"  alt={{products.productNameRus}} title={{products.productNameRus}} style="width: 130px; padding-left: 30px; padding-top: 10px;">
+              </div>         
+              <div class="priceDiv">
+                {{products.productRetailPrice}} т.
+              </div>   
+              <div class="nameDiv">
+                {{products.productNameRus}}, {{products.productUnitName}}
+              </div>
+              <div class="basketDiv">
+                В корзину
+              </div>
+            </div>          
+          </ng-template>
+        </ng-container>    
+      </owl-carousel-o>
+      <!-- Карусель товаров (конец) -->            
+    </div>               
+  </div>      
+</div>
+

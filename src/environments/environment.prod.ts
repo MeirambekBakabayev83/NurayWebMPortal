@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  onlineStoreNsiServiceUrl: 'http://localhost:8282/integration-nsi-ws/'
 };
