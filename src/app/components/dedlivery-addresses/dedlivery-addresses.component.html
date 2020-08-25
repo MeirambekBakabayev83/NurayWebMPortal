@@ -1,0 +1,34 @@
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.4)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+<div class="col-12 breadCrump">            
+    <div class="container">
+        <div class="row" style="vertical-align: middle;">        
+            <div class="col-4" style="text-align: left;">
+                <text (click) = "goBack()" style="font-size: 0.9em;">
+                    <fa-icon [icon]="faReply" size="1x"></fa-icon>&nbsp;
+                    Назад
+                </text>
+            </div>            
+            <div class="col-4" >
+                <text style="font-size: 0.8em;">                    
+                    
+                </text>
+            </div>                        
+            <div class="col-4" style="text-align: right;">
+                <text (click) = "addDeliveryAddress()" style="font-size: 0.9em;">
+                    <fa-icon [icon]="faAddressBook" size="1x"></fa-icon>&nbsp;
+                    Добавить
+                </text>
+            </div>                        
+        </div>    
+    </div>
+</div>
+<div class="container">
+    <p>dedlivery-addresses works!</p>
+</div>

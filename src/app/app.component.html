@@ -13,7 +13,32 @@
 <div class="footer">
   <div class="row">
     <div class="col-12">
-      TEST
+      <div class="row">
+        <div class="col-3">
+          <div class="footerIconCls">
+            <fa-icon [icon]="faHome" size="2x" (click) = "goHome()"></fa-icon>
+            Главная
+          </div> 
+        </div>
+        <div class="col-3">
+          <div class="footerIconCls">
+            <fa-icon [icon]="faBars" size="2x" (click) = "goProductCategories()"></fa-icon>
+            Категории
+          </div> 
+        </div>
+        <div class="col-3">
+          <div class="footerIconCls">
+            <fa-icon [icon]="faShoppingCart" size="2x" (click) = "goBuyerBasket()"></fa-icon>
+            Корзина: {{basketModel.productsTotalCount}}
+          </div> 
+        </div>             
+        <div class="col-3">
+          <div class="footerIconCls">
+            <fa-icon [icon]="faUser" size="2x" (click) = "goBuyerProfile()"></fa-icon>
+            Профиль
+          </div> 
+        </div>                        
+      </div>                                      
     </div>  
   </div>
 </div>

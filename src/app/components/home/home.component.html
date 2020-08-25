@@ -34,21 +34,46 @@
 
       <!-- Карусель товаров (начало) -->     
       <owl-carousel-o [options]="customOptions">
-        <ng-container *ngFor="let products of pg.products; let i = index">
-          <ng-template carouselSlide id={{products.productId}}>
+        <ng-container *ngFor="let product of pg.products; let i = index">
+          <ng-template carouselSlide id={{product.productId}}>
             <div class="productContainer">
               <div class="imgDiv">
-                <img src="assets/img/orange.png"  alt={{products.productNameRus}} title={{products.productNameRus}} style="width: 130px; padding-left: 30px; padding-top: 10px;">
+                <img src="assets/img/orange.png"  alt={{product.productNameRus}} title={{product.productNameRus}} style="width: 130px; padding-left: 30px; padding-top: 10px;">
               </div>         
               <div class="priceDiv">
-                {{products.productRetailPrice}} т.
+                {{product.productRetailPrice}} т.
               </div>   
               <div class="nameDiv">
-                {{products.productNameRus}}, {{products.productUnitName}}
+                {{product.productNameRus}}, {{product.productUnitName}}
               </div>
-              <div class="basketDiv">
-                В корзину
+              <div *ngIf="product.viewBasket == false; then notViewBasketBlock else viewBasketBlock">
               </div>
+              <ng-template #notViewBasketBlock>
+                <div class="basketDiv" (click) = "addBasket(product)">
+                  В корзину
+                </div>
+              </ng-template>
+              <ng-template #viewBasketBlock>
+                <div class="basketAddDiv">
+                  <div class="row">
+                    <div class="col-2">
+                      <fa-icon [icon]="faMinus" (click) = "delBasketThisProduct(product)"></fa-icon>
+                    </div>
+                    <div class="col-6">                      
+                      <div *ngIf="product.isWeight == 0; then notWeightProduct else weightProduct"></div>
+                      <ng-template #weightProduct>
+                        <p name="product.productCode" [(ngModel)]="product.productCount" ngDefaultControl>{{product.productCount | number:'1.1'}} {{product.productUnitName}}</p>
+                      </ng-template>
+                      <ng-template #notWeightProduct>
+                        <p name="product.productCode" [(ngModel)]="product.productCount" ngDefaultControl>{{product.productCount}} {{product.productUnitName}}</p>
+                      </ng-template>                      
+                    </div>
+                    <div class="col-2">
+                      <fa-icon [icon]="faPlus" (click) = "addBasketThisProduct(product)"></fa-icon>
+                    </div>                                        
+                  </div>
+                </div>
+              </ng-template>                            
             </div>          
           </ng-template>
         </ng-container>    

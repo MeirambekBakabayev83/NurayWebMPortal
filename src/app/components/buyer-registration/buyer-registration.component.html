@@ -1,0 +1,142 @@
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.4)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+<div class="col-12 breadCrump">            
+    <div class="container">
+        <div class="row" style="vertical-align: middle;">        
+            <div class="col-4" style="text-align: left;">
+                <text (click) = "goBack()" style="font-size: 0.9em;">
+                    <fa-icon [icon]="faReply" size="1x"></fa-icon>&nbsp;
+                    Назад
+                </text>
+            </div>            
+            <div class="col-4" >
+                <text style="font-size: 0.8em;">                    
+                    
+                </text>
+            </div>                        
+            <div class="col-4" style="text-align: right;">
+                <div *ngIf="isBuyerSave == true; then viewBuyerSave else notViewBuyerSave">
+                </div>
+                <ng-template #notViewBuyerSave>
+                    <text (click) = "buyerSave()" style="font-size: 0.9em;">
+                        <fa-icon [icon]="faSave" size="1x"></fa-icon>&nbsp;
+                        Сохранить
+                    </text>
+                </ng-template>
+                <ng-template #viewBuyerSave>
+                    <text (click) = "buyerCorrect()" style="font-size: 0.9em;">
+                        <fa-icon [icon]="faEdit" size="1x"></fa-icon>&nbsp;
+                        Изменить
+                    </text>
+                </ng-template>                
+            </div>                        
+        </div>    
+    </div>
+</div>
+<div class="container">
+    <div *ngIf="isAuthView == true; then viewAuth else notViewAuth">
+    </div>
+    <ng-template #notViewAuth>
+        <div class="row" style="min-height: 350px; overflow-y: auto;">
+            <div class="col-12" style="margin-bottom: 1px; margin-top: 15px;">
+                <text style="font-size: 0.8em; color: crimson; font-weight: 500;" [hidden]="isBuyerSave">Все нижеперечисленные поля обязательны к заполнению.</text>
+                <mat-form-field class="example-full-width" style="display: inline-block !important; width: 98%; font-size: 13px; font-weight: 500;">
+                    <mat-label>Фамилия</mat-label>
+                    <input matInput [(ngModel)]="buyerVerifyModel.firstName" [disabled]="isBuyerSave" placeholder="Фамилия">
+                </mat-form-field>
+                <mat-form-field class="example-full-width" style="display: inline-block !important; width: 98%; font-size: 13px; font-weight: 500;">
+                    <mat-label>Имя</mat-label>
+                    <input matInput [(ngModel)]="buyerVerifyModel.name" [disabled]="isBuyerSave" placeholder="Имя">
+                </mat-form-field>
+                <mat-form-field class="example-full-width" style="display: inline-block !important; width: 98%; font-size: 13px; font-weight: 500;">
+                    <mat-label>Пол</mat-label>
+                    <mat-select [(value)]="buyerVerifyModel.sex" [disabled]="isBuyerSave">
+                        <mat-option value="U" selected>Не выбран</mat-option>
+                        <mat-option value="M" selected>Мужской</mat-option>
+                        <mat-option value="W">Женский</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="example-full-width" style="display: inline-block !important; width: 98%; font-size: 13px; font-weight: 500;">
+                    <mat-label>Контактный телефон - (XXX) XXX XX XX</mat-label>
+                    <input matInput [(ngModel)]="buyerVerifyModel.contactPhone" prefix="+7 " mask="(000) 000 00 00" [disabled]="isBuyerSave" placeholder="Контактный телефон (XXX) XXX XX XX" >                    
+                </mat-form-field>
+                <mat-form-field class="example-full-width" style="display: inline-block !important; width: 98%; font-size: 13px; font-weight: 500;">
+                    <mat-label>Дата рождения - ДД.ММ.ГГГГ</mat-label>
+                    <input matInput [matDatepicker]="birthDatePicker" [(ngModel)]="buyerVerifyModel.birthDate" [disabled]="isBuyerSave" placeholder="Дата рождения ДД.ММ.ГГГГ">
+                    <mat-datepicker-toggle matSuffix [for]="birthDatePicker"></mat-datepicker-toggle>
+                    <mat-datepicker #birthDatePicker></mat-datepicker>
+                </mat-form-field>                
+            </div>
+            <div class="col-12" [hidden]="!isBuyerSave" style="margin-bottom: 1px; margin-top: 15px;">
+                <button id="btnDeliveryAddresses" class="btn btn-primary" style="width: 98%;" (click)="goToDeliveryAddresses()">Адреса доставки</button>
+            </div>
+        </div>
+    </ng-template>
+    <ng-template #viewAuth>
+        <div class="row" style="min-height: auto;">        
+            <div class="col-12" style="margin-bottom: 1px; margin-top: 15px; text-align: center;">
+                <text style="font-size: 1 em; color: mediumblue; font-weight: 500;">Введите код из почты отправленный на </text>
+                <text style="font-size: 1 em; color: crimson; font-weight: 500;">{{buyerVerifyModel?.eMail}}</text>
+            </div>
+            <div class="col-12">   
+                <div class="form-group">
+                    <div class="col-12" style="text-align: center;">
+                        <input type="text" mask="9" id="fCode" name="fCode" class="form-control" [(ngModel)]="fCode" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('sCode')" (focus)="onFocus('fCode')"> &nbsp;
+                        <input type="text" mask="9" id="sCode" name="sCode" class="form-control" [(ngModel)]="sCode" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('thCode')" (focus)="onFocus('sCode')"> &nbsp;
+                        <input type="text" mask="9" id="thCode" name="thCode" class="form-control" [(ngModel)]="thCode" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('fourCode')" (focus)="onFocus('thCode')"> &nbsp;
+                        <input type="text" mask="9" id="fourCode" name="fourCode" class="form-control" [(ngModel)]="fourCode" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('fiveCode')" (focus)="onFocus('fourCode')"> &nbsp;
+                        <input type="text" mask="9" id="fiveCode" name="fiveCode" class="form-control" [(ngModel)]="fiveCode" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('fPIN')" (focus)="onFocus('fiveCode')"> 
+                    </div>                         
+                </div>                   
+            </div> 
+            <div class="col-12">   
+                <div class="form-group">
+                    <div class="col-12" style="text-align: center; margin-top: 1px;">                                    
+                        <button id="btnReplySendCode" class="btn btn-primary" style="width: 250px;" (click)="replySendCode()">Отправить код повторно</button>
+                    </div>
+                </div>                  
+            </div>          
+            <div class="col-12" style="margin-bottom: 1px; margin-top: 5px; text-align: center;">
+                <text style="font-size: 1 em; color: mediumblue; font-weight: 500;">Придумайте PIN - код </text>                
+            </div>                 
+            <div class="col-12">   
+                <div class="form-group">
+                    <div class="col-12" style="text-align: center;">
+                        <input type="password" mask="9" id="fPIN" name="fPIN" class="form-control" [(ngModel)]="fPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('sPIN')" (focus)="onFocus('fPIN')"> &nbsp;
+                        <input type="password" mask="9" id="sPIN" name="sPIN" class="form-control" [(ngModel)]="sPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('thPIN')" (focus)="onFocus('sPIN')"> &nbsp;
+                        <input type="password" mask="9" id="thPIN" name="thPIN" class="form-control" [(ngModel)]="thPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('fourPIN')" (focus)="onFocus('thPIN')"> &nbsp;
+                        <input type="password" mask="9" id="fourPIN" name="fourPIN" class="form-control" [(ngModel)]="fourPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('fRPIN')" (focus)="onFocus('fourPIN')"> &nbsp;                        
+                    </div>                         
+                </div>                   
+            </div>             
+
+            <!-- Повтор ПИН -->
+            <div class="col-12" style="margin-bottom: 1px; margin-top: 5px; text-align: center;">
+                <text style="font-size: 1 em; color: mediumblue; font-weight: 500;">Повторите PIN - код </text>                
+            </div>                 
+            <div class="col-12">   
+                <div class="form-group">
+                    <div class="col-12" style="text-align: center;">
+                        <input type="password" mask="9" id="fRPIN" name="fRPIN" class="form-control" [(ngModel)]="fRPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('sRPIN')" (focus)="onFocus('fRPIN')"> &nbsp;
+                        <input type="password" mask="9" id="sRPIN" name="sRPIN" class="form-control" [(ngModel)]="sRPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('thRPIN')" (focus)="onFocus('sRPIN')"> &nbsp;
+                        <input type="password" mask="9" id="thRPIN" name="thPIN" class="form-control" [(ngModel)]="thRPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('fourRPIN')" (focus)="onFocus('thRPIN')"> &nbsp;
+                        <input type="password" mask="9" id="fourRPIN" name="fourRPIN" class="form-control" [(ngModel)]="fourRPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (focus)="onFocus('fourRPIN')"> &nbsp;                        
+                    </div>                         
+                </div>                   
+            </div>                         
+            <div class="col-12">   
+                <div class="form-group">
+                    <div class="col-12" style="text-align: center; margin-top: 5px; font-size: 8px;">                                    
+                        <button id="btnRegistered" class="btn btn-success" style="width: 150px;" (click)="nextRegistration()">Далее</button>
+                    </div>
+                </div>                  
+            </div>          
+        </div>
+    </ng-template>    
+</div>

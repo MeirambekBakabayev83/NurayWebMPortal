@@ -1,0 +1,32 @@
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.4)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+<div class="container">
+    <div class="row">
+        <div class="col-12" style="margin-bottom: 10px; margin-top: 5px; text-align: center; line-height: 15px;">
+            <text style="font-size: 1em; color: crimson; font-weight: 500;">Для установления взаимовыгодного сотрудничества просим Вас указать максимально полные и верные данные.</text>
+        </div>
+        <div class="col-12">   
+            <div class="form-group">
+                <text style="font-size: 1em; color: mediumblue;">Укажите электронную почту <sup style="color: crimson;">*</sup></text>
+                <input class="form-control" type="email" id="buyerEMail" name="buyerEMail" [(ngModel)]="buyerVerifyModel.eMail" #buyerEMail="ngModel" 
+                placeholder="example@gmail.com" style="display: inline-block !important; width: 98%;" required email>                       
+            </div> 
+            <div class="form-group">
+                <div class="col-12" style="margin-bottom: 5px; margin-top: 1px; text-align: center; line-height: 15px;">
+                    <text style="font-size: 0.8em; color: crimson; font-weight: 500;">На указанный Вами почтовый адрес будет направлен код идентификаций клиента для последующей, полноценной работы в интернет - магазине. Входящее письмо может быть доставлено в другие папки, просим проверить внимательно. Спасибо что Вы с нами!</text>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-12" style="text-align: center; margin-top: 10px;">            
+                    <button id="btnRegistered" [disabled]="buyerEMail.invalid" class="btn btn-success" style="width: 150px;" (click) = "sendEMailForGetVerifyCode()">Получить код</button>
+                </div>
+            </div>                    
+        </div>                
+    </div>
+</div>

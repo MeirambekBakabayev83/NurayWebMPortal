@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  onlineStoreNsiServiceUrl: 'http://localhost:8282/integration-nsi-ws/'
+  onlineStoreNsiServiceUrl: 'http://localhost:8282/integration-nsi-ws/',
+  onlineStoreMailServiceUrl: 'http://localhost:8282/mail-ws/'
 };
 
 /*
