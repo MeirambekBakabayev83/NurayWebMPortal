@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router} from '@angular/router';
 import { OnlineStoreService } from 'src/app/services/online-store.service';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { Subject } from 'rxjs';
@@ -22,65 +23,20 @@ declare var $: any;
 export class HomeComponent implements OnInit {
 
   customOptions: OwlOptions = {
-    loop: true,
+    loop: false,    
+    stagePadding: 10,
     mouseDrag: true,
     touchDrag: true,
     pullDrag: false,
     dots: false,
     navSpeed: 700,
     navText: ['', ''],
-    responsive: {
-      0: {
-        items: 1
-      },
-      200: {
-        items: 2
-      },
-      400: {
-        items: 3
-      },
-      600: {
-        items: 4
-      },
-      800: {
-        items: 5
-      },      
-      1000: {
-        items: 6
-      },          
-      1200: {
-        items: 7
-      },           
-      1400: {
-        items: 8
-      },           
-      1600: {
-        items: 9
-      },
-      1800: {
-        items: 10
-      }                        
-    },
-    nav: false
+    margin:10, 
+    items: 1,   
+    autoWidth: true,        
+    nav: false,    
   }
 
-  /*slides = [
-    {'image': 'https://gsr.dev/material2-carousel/assets/demo.png',
-      'productId': '1', 'title': '1 slide'
-    }, 
-    {'image': 'https://gsr.dev/material2-carousel/assets/demo.png',
-      'productId': '2', 'title': '2 slide'
-    }, 
-    {'image': 'https://gsr.dev/material2-carousel/assets/demo.png',
-      'productId': '3', 'title': '3 slide'
-    }, 
-    {'image': 'https://gsr.dev/material2-carousel/assets/demo.png',
-      'productId': '4', 'title': '4 slide'
-    }, 
-    {'image': 'https://gsr.dev/material2-carousel/assets/demo.png',
-      'productId': '5', 'title': '5 slide'
-    }, 
-  ];*/
 
   dtElement: DataTableDirective;
   dtOptions: DataTables.Settings = {};  
@@ -95,7 +51,7 @@ export class HomeComponent implements OnInit {
   faMinus = faMinus;
   faHome = faHome;
 
-  constructor(private onlineStoreService: OnlineStoreService, private http: HttpClient, private spinner: NgxSpinnerService) { }
+  constructor(private onlineStoreService: OnlineStoreService, private http: HttpClient, private spinner: NgxSpinnerService, private router: Router) { }
 
   ngOnInit(): void {
     this.getProductGroupList();
@@ -151,6 +107,13 @@ export class HomeComponent implements OnInit {
     }
 
     this.onlineStoreService.delCorrectItemBasketModel(item, minusProductCount);    
+  }
+
+  goToSubProducts(productGroupId){
+    this.router.navigate(
+      ['/subProducts', productGroupId], 
+      {}
+    );
   }
 
   public showGritterNotify(type: string, message: string){

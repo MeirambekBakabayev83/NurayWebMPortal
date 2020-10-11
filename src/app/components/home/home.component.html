@@ -27,7 +27,7 @@
         <div class="col-6 mainPGList">
           {{pg?.productGroupNameRus}}
         </div>        
-        <div class="col-6 mainPGProductCount">
+        <div class="col-6 mainPGProductCount" (click)="goToSubProducts(pg.productGroupId)">
           Смотреть все {{pg?.productsCount}}
         </div>    
       </div>    
@@ -37,8 +37,8 @@
         <ng-container *ngFor="let product of pg.products; let i = index">
           <ng-template carouselSlide id={{product.productId}}>
             <div class="productContainer">
-              <div class="imgDiv">
-                <img src="assets/img/orange.png"  alt={{product.productNameRus}} title={{product.productNameRus}} style="width: 130px; padding-left: 30px; padding-top: 10px;">
+              <div class="mainPageImgDiv">
+                <img src={{product.productPhotoUrl}}  alt={{product.productNameRus}} title={{product.productNameRus}} style="height: 80px; width: 100px; padding-top: 10px;">
               </div>         
               <div class="priceDiv">
                 {{product.productRetailPrice}} т.

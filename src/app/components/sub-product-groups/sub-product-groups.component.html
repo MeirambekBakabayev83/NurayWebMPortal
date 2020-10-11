@@ -1,0 +1,21 @@
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.4)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+<div class="mainPGContent">
+    <div (click)="goToHome()">Назад</div>
+    <p>{{productGroupId}}</p>    
+    <owl-carousel-o [options]="customOptions">        
+        <ng-container *ngFor="let pg of productGroups; let i = index">
+            <ng-template carouselSlide id={{pg.productGroupId}}>
+                <div class="subPGContainers">
+                    {{pg?.productGroupNameRus}}
+                </div>
+            </ng-template>
+        </ng-container>        
+    </owl-carousel-o>        
+</div>
