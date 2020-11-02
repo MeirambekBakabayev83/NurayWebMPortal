@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute} from '@angular/router';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
+import { OnlineStoreService } from 'src/app/services/online-store.service';
 import { Subject } from 'rxjs';
 import { NgxSpinnerService } from "ngx-spinner";
 import { environment } from 'src/environments/environment';
 import { ProductGroups } from 'src/app/models/productGroup';
 import { ViewEncapsulation } from '@angular/core';
 import { OwlOptions } from 'ngx-owl-carousel-o';
+import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
 declare var $: any;
 
 @Component({
@@ -15,7 +17,11 @@ declare var $: any;
   styleUrls: ['./sub-product-groups.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class SubProductGroupsComponent implements OnInit {
+export class SubProductGroupsComponent implements OnInit, AfterViewInit {
+
+  faPlus = faPlus;
+  faMinus = faMinus;
+  faHome = faHome;
 
   customOptions: OwlOptions = {
     loop: false,    
@@ -23,7 +29,7 @@ export class SubProductGroupsComponent implements OnInit {
     touchDrag: true,
     pullDrag: false,
     dots: false,
-    margin:10,    
+    margin:5,    
     navSpeed: 700,
     navText: ['', ''], 
     items: 1,   
@@ -32,14 +38,21 @@ export class SubProductGroupsComponent implements OnInit {
   }
 
   productGroupId: number;
+  selectedProductGroupId: number;
   errTxt: string;
   productGroups: any;
+  subGroupProducts: any;
 
-  constructor(private activateRoute: ActivatedRoute, private router: Router, private http: HttpClient, private spinner: NgxSpinnerService) { 
+  constructor(private activateRoute: ActivatedRoute, private router: Router, private http: HttpClient, private spinner: NgxSpinnerService, private onlineStoreService: OnlineStoreService) { 
     this.productGroupId = this.activateRoute.snapshot.params['productGroupId'];        
   }
 
   ngOnInit(): void {
+
+    this.onlineStoreService.goToReturn("home");
+  }  
+
+  ngAfterViewInit(): void{
     this.getProductGroupList();
   }
 
@@ -47,13 +60,53 @@ export class SubProductGroupsComponent implements OnInit {
     this.router.navigate(['']);
   }
 
+  addBasket(item: any){
+    this.onlineStoreService.fillBasketModel(item);          
+    item.viewBasket =true;    
+  }
+
+  addBasketThisProduct(item: any) {
+    if (item.isWeight == 0){
+      item.productCount = item.productCount + 1;
+    } 
+    else{
+      item.productCount = item.productCount + 0.1;
+    }
+
+    this.onlineStoreService.addCorrectItemBasketModel(item);          
+  }
+
+  delBasketThisProduct(item: any) {                  
+    
+    let minusProductCount: number;
+
+    if (item.isWeight == 0){      
+      minusProductCount = 1;
+    }
+    else {      
+      minusProductCount = 0.1;
+    }
+
+    this.onlineStoreService.delCorrectItemBasketModel(item, minusProductCount);    
+  }
+
   getProductGroupList(){
     this.spinner.show();
     let productGroupListUrl = environment.onlineStoreNsiServiceUrl + 'getSubProductGroupModel?productGroupId=' + this.productGroupId;
     this.http.get(productGroupListUrl).subscribe((data:any) => 
     {
-      this.productGroups=data; 
-      //console.log("this.productGroups: " + JSON.stringify(this.productGroups));
+      this.productGroups=data;       
+      if (localStorage.getItem("selectedProductGroupId")){
+        this.selectedProductGroupId = parseInt(localStorage.getItem("selectedProductGroupId"));
+        this.subGroupProducts = this.productGroups.find(x => x.productGroupId == this.selectedProductGroupId).products;    
+      }    
+      else {
+        this.subGroupProducts = this.productGroups[0].products;     
+        this.selectedProductGroupId = this.productGroups[0].productGroupId;
+      }        
+  
+      console.log("this.selectedProductGroupId: " + this.selectedProductGroupId) ;
+
       this.spinner.hide();
     },
     error => 
@@ -63,6 +116,24 @@ export class SubProductGroupsComponent implements OnInit {
       this.showGritterNotify( "error", "Ошибка при получении списка товаров");
       this.spinner.hide();      
     })    
+  }  
+
+  getListSubProducts(productGroupID){
+    //alert(productGroupID);
+    this.subGroupProducts = this.productGroups.find(x => x.productGroupId == productGroupID).products;
+    this.selectedProductGroupId = productGroupID;
+    localStorage.setItem("selectedProductGroupId", productGroupID);
+
+    console.log("this.selectedProductGroupId: " + this.selectedProductGroupId) ;
+  }
+
+  goToProductDetails(productCode){
+    this.router.navigate(
+      ['/productDetails', productCode], 
+      {}
+    );
+
+    this.onlineStoreService.goToReturn("subProducts/" + this.productGroupId);
   }  
 
   public showGritterNotify(type: string, message: string){

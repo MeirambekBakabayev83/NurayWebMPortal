@@ -31,7 +31,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { BuyerRegistrationComponent } from './components/buyer-registration/buyer-registration.component';
 import { DedliveryAddressesComponent } from './components/dedlivery-addresses/dedlivery-addresses.component';
-import { SubProductGroupsComponent } from './components/sub-product-groups/sub-product-groups.component'; 
+import { SubProductGroupsComponent } from './components/sub-product-groups/sub-product-groups.component';
+import { ProductDetailsComponent } from './components/product-details/product-details.component'; 
 
 polyfill();
 enableProdMode();
@@ -46,6 +47,7 @@ const appRoutes: Routes =[
   { path: 'buyerRegistration', canActivate: [AppGuard], component: BuyerRegistrationComponent,  pathMatch:'full'},   
   { path: 'deliveryAdresses', canActivate: [AppGuard], component: DedliveryAddressesComponent,  pathMatch:'full'},   
   { path: 'subProducts/:productGroupId', canActivate: [AppGuard], component: SubProductGroupsComponent, pathMatch:'full'},  
+  { path: 'productDetails/:productCode', canActivate: [AppGuard], component: ProductDetailsComponent, pathMatch:'full'},  
   { path: '**', redirectTo: '/'}
 ]
 
@@ -56,7 +58,7 @@ const maskConfig: Partial<IConfig> = {
 @NgModule({
   declarations: [    
     AppComponent,    
-    HomeComponent, CategoriesComponent, BuyerBasketComponent, BuyerProfileComponent, BuyerRegistrationComponent, DedliveryAddressesComponent, SubProductGroupsComponent
+    HomeComponent, CategoriesComponent, BuyerBasketComponent, BuyerProfileComponent, BuyerRegistrationComponent, DedliveryAddressesComponent, SubProductGroupsComponent, ProductDetailsComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA

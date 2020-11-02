@@ -18,6 +18,9 @@ export class OnlineStoreService {
   private isBasketUpd = new Subject<Basket>();
   isBasketUpd$ = this.isBasketUpd.asObservable(); 
 
+  private isReturnBack = new Subject<string>();
+  isReturnBack$ = this.isReturnBack.asObservable(); 
+
   private isBuyerVerify = new Subject<BuyerVerify>();
   isBuyerVerify$ = this.isBuyerVerify.asObservable();
 
@@ -45,6 +48,12 @@ export class OnlineStoreService {
       })
     }));
        
+  }
+
+  goToReturn(routeName: string){    
+    
+    this.isReturnBack.next(routeName);
+    
   }
 
   fillBasketModel(productItem: any){          

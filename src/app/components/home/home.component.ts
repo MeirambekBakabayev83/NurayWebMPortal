@@ -114,7 +114,19 @@ export class HomeComponent implements OnInit {
       ['/subProducts', productGroupId], 
       {}
     );
+
+    this.onlineStoreService.goToReturn("home");    
+    localStorage.removeItem("selectedProductGroupId");
   }
+
+  goToProductDetails(productCode){
+    this.router.navigate(
+      ['/productDetails', productCode], 
+      {}
+    );
+
+    this.onlineStoreService.goToReturn("home");
+  }  
 
   public showGritterNotify(type: string, message: string){
     $.gritter.add({      

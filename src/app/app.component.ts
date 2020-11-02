@@ -4,7 +4,7 @@ import { ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { OnlineStoreService } from 'src/app/services/online-store.service';
-import { faHome, faBars, faShoppingBasket, faUser, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faBars, faShoppingBasket, faUser, faShoppingCart, faBackspace } from '@fortawesome/free-solid-svg-icons';
 import { Basket } from 'src/app/models/basket';
 
 @Component({
@@ -15,6 +15,8 @@ import { Basket } from 'src/app/models/basket';
 })
 export class AppComponent implements OnInit {
   title = 'NurayWebProject';
+  isComBack: boolean = false;
+  routeName: string = "home";
 
   basketModel: Basket = new Basket();
 
@@ -23,6 +25,7 @@ export class AppComponent implements OnInit {
   faShoppingBasket = faShoppingBasket;
   faShoppingCart = faShoppingCart;
   faUser = faUser;
+  faBackspace = faBackspace;
 
   constructor(updates:  SwUpdate, private router: Router, private onlineStoreService: OnlineStoreService) {    
     updates.available.subscribe((event) => {
@@ -37,10 +40,27 @@ export class AppComponent implements OnInit {
       this.basketModel = basketModelFromService;    
       console.log("this.basketModel: " + JSON.stringify(this.basketModel));            
     })            
+
+    this.onlineStoreService.isReturnBack$.subscribe(routeName => {
+      this.routeName = routeName;      
+      this.isComBack = true;
+    })    
+
   }
   
   goHome() {
     this.router.navigate(["home"]);
+  }
+
+  goToBack(){
+    if (this.routeName == "home"){
+      this.isComBack = false;
+    }
+    else {
+      this.isComBack = true;
+    }
+    
+    this.router.navigate([this.routeName]);
   }
 
   goProductCategories() {

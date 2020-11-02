@@ -1,0 +1,62 @@
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.4)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+<div class="mainPGContent">      
+    <div class="card-block">
+        <div class="row" style="margin-left: 10px; margin-top: 10px;">
+            <div class="col-12">
+                <div class="productDetailContainer">
+                    <div class="mainPageImgDiv">
+                      <img src={{selectedProductData.productPhotoUrl}}  alt={{selectedProductData.productNameRus}} title={{selectedProductData.productNameRus}} style="height: 25vh; padding-top: 5px;">
+                    </div>         
+                    <div class="productDetailPriceDiv">
+                      {{selectedProductData.productRetailPrice}} т.
+                    </div>   
+                    <div class="productDetailNameDiv">
+                      {{selectedProductData.productNameRus}}, {{selectedProductData.productUnitName}}
+                    </div>
+                    <div class="productDetailNameDiv">
+                        <b>Код продукта:</b> {{selectedProductData.productCode}}
+                    </div>                                     
+                    <div class="nameDiv">
+                        <b>Описание:</b> {{selectedProductData.productDescrRus}}
+                    </div>
+                    <div *ngIf="selectedProductData.viewBasket == false; then notViewBasketBlock else viewBasketBlock">
+                    </div>
+                    <ng-template #notViewBasketBlock>
+                      <div class="productDetailBasketDiv" (click) = "addBasket(selectedProductData)">
+                        В корзину
+                      </div>
+                    </ng-template>
+                    <ng-template #viewBasketBlock>
+                      <div class="productDetailBasketAddDiv">
+                        <div class="row">
+                          <div class="col-2">
+                            <fa-icon [icon]="faMinus" (click) = "delBasketThisProduct(selectedProductData)"></fa-icon>
+                          </div>
+                          <div class="col-8">                      
+                            <div *ngIf="selectedProductData.isWeight == 0; then notWeightProduct else weightProduct"></div>
+                            <ng-template #weightProduct>
+                              <p name="selectedProductData.productCode" [(ngModel)]="selectedProductData.productCount" ngDefaultControl>{{selectedProductData.productCount | number:'1.1'}} {{selectedProductData.productUnitName}}</p>
+                            </ng-template>
+                            <ng-template #notWeightProduct>
+                              <p name="selectedProductData.productCode" [(ngModel)]="selectedProductData.productCount" ngDefaultControl>{{selectedProductData.productCount}} {{selectedProductData.productUnitName}}</p>
+                            </ng-template>                      
+                          </div>
+                          <div class="col-2">
+                            <fa-icon [icon]="faPlus" (click) = "addBasketThisProduct(selectedProductData)"></fa-icon>
+                          </div>                                        
+                        </div>
+                      </div>
+                    </ng-template>                            
+                </div>  
+
+            </div>
+        </div>
+    </div>
+</div>
