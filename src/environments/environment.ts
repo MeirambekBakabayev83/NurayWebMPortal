@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   onlineStoreNsiServiceUrl: 'http://localhost:8282/integration-nsi-ws/',
+  onlineStoreOrderServiceUrl: 'http://localhost:8282/orders-ws/',
   onlineStoreMailServiceUrl: 'http://localhost:8282/mail-ws/'
 };
 

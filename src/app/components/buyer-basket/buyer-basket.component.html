@@ -1,1 +1,161 @@
-<p>buyer-basket works!</p>
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.4)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+<div class="mainPGContent"> 
+    <div *ngIf="isSendOrder == true; then viewOrderCommand else notViewOrderCommand">
+    </div>
+    <ng-template #notViewOrderCommand>
+      <div class="basketOrderSumm">
+        <div class="row" style="padding-left: 20px;">
+          Сумма покупки: {{basketModel.productsTotalSumm | number:'':'fr'}} тг.
+        </div>                    
+        <div class="row" style="text-align: center; padding: 0 10px; position: relative;">
+          <div class="col-6">
+            <button id="btnSendOrder" class="btn btn-primary" style="width: 100%;" (click)="sendOrder()">Оформить заказ</button>
+          </div>
+          <div class="col-6">
+            <button id="btnClearOrder" class="btn btn-danger" style="width: 100%;" (click)="clearOrder()">Очистить</button>
+          </div>                    
+        </div>              
+      </div>      
+    </ng-template> 
+    <ng-template #viewOrderCommand>
+      <div class="basketFinishOrderSumm">
+        <div class="row" style="text-align: center; padding: 0 10px; margin-top: 5px; position: relative;">
+          <div class="col-6">
+            <button id="btnSendFinishOrder" class="btn btn-primary" style="width: 100%;" (click)="finishSendOrder()">Оформить заказ</button>
+          </div>
+          <div class="col-6">
+            <button id="btnListBasket" class="btn btn-danger" style="width: 100%;" (click)="viewListBasket()">К списку</button>
+          </div>                    
+        </div>                
+        <div class="row" style="padding-left: 20px; margin-top: 10px;">
+          <div class="col-6">
+            Сумма покупки: 
+          </div>
+          <div class="col-6">
+            {{basketModel.productsTotalSumm | number:'':'fr'}} тг.
+          </div>                    
+        </div>                            
+        <div class="row" style="padding-left: 20px;">          
+          <div class="col-6">
+            Сумма доставки: 
+          </div>
+          <div class="col-6">
+            {{basketModel.deliverySumm | number:'':'fr'}} тг.
+          </div>                       
+        </div>                            
+        <div class="row" style="padding-left: 20px;">          
+          <div class="col-6">
+            Итоговая сумма заказа: 
+          </div>
+          <div class="col-6">
+            {{basketModel.productsTotalSumm + basketModel.deliverySumm | number:'':'fr'}} тг.
+          </div>                       
+        </div>                            
+        <div class="row" style="padding-left: 20px;">          
+          <div class="col-6">
+            ФИО покупателя: 
+          </div>
+          <div class="col-6">
+            {{basketModel.buyerModel.firstName}}&nbsp;{{basketModel.buyerModel.name}}.
+          </div>                       
+        </div>                                    
+        <div class="row" style="padding-left: 20px;">          
+          <div class="col-6">
+            Контактный номер: 
+          </div>
+          <div class="col-6">
+            +7{{basketModel.buyerModel.contactPhone}}.
+          </div>                       
+        </div>                                    
+        <div class="row" style="padding-left: 20px;">             
+          <div class="col-12">
+            <fieldset class="field_set">
+              <legend style="font-size: 15px; padding: 0 10px; width: auto;">Метод получения</legend>
+              <mat-radio-group
+              aria-labelledby="example-radio-group-label"
+              class="example-radio-group"
+              [(ngModel)]="methodDelvery">
+                <div class="row">
+                  <div class="col-6">
+                    <mat-radio-button value=1  (change)="radioChange($event)">Самовывоз</mat-radio-button>
+                  </div>
+                  <div class="col-6">
+                    <mat-radio-button value=2  (change)="radioChange($event)">Доставка</mat-radio-button>
+                  </div>
+                </div>              
+              </mat-radio-group>
+            </fieldset>                   
+          </div>                   
+        </div>
+        <div class="row" style="padding-left: 20px; margin-top: 5px;" *ngIf="methodDelvery == 2">             
+          <div class="col-12">
+            <mat-form-field class="example-full-width" style="display: inline-block !important; width: 95%; font-size: 15px; font-weight: 500;">
+              <mat-label>Адрес доставки <sup class="supCls">&nbsp;*</sup></mat-label>
+              <mat-select [(value)]="deliveryAddressId" (selectionChange)="getFullDeliveryAddress($event.value)">                                        
+                  <mat-option *ngFor="let deliveryAddress of userDeliveryAddressList" [value]="deliveryAddress.udaId">
+                      {{deliveryAddress.addressNote}}
+                  </mat-option> 
+              </mat-select>
+            </mat-form-field>  
+            <div class="selectedDeliveryAddress" *ngIf="isSlectedDeliveryAddress == true">
+              Полный адрес: {{selectedDeliveryAddress.rusFullAddress}}
+            </div>                      
+          </div>
+        </div>
+      </div>            
+    </ng-template>       
+    <div class="basketProductsContainer">
+      <div *ngIf="isSendOrder == true; then viewOrderSender else notViewOrderSender">
+      </div>
+      <ng-template #notViewOrderSender>
+        <div class="row basketProduct" *ngFor="let basketProduct of basketModel.basketProducts">
+          <div class="col-2 basketImgDiv" (click)="goToProductDetails(basketProduct.productCode)">
+              <img src={{basketProduct.productPhotoUrl}}  alt={{basketProduct.productName}} title={{basketProduct.productName}} style="height: 7vh; padding-top: 5px;">
+          </div>
+          <div class="col-6" >
+              <div class="basketProductName">{{basketProduct.productName}}</div>
+              <div class="buyerBasketDiv">
+                  <div class="row">
+                    <div class="col-2">
+                      <fa-icon [icon]="faMinus" (click) = "delBasketThisProduct(basketProduct)"></fa-icon>
+                    </div>
+                    <div class="col-6">                      
+                      <div *ngIf="basketProduct.isWeight == 0; then notWeightProduct else weightProduct"></div>
+                      <ng-template #weightProduct>
+                        <p name="basketProduct.productCode" [(ngModel)]="basketProduct.productCount" ngDefaultControl>{{basketProduct.productCount | number:'.1'}} {{basketProduct.productUnitName}}</p>
+                      </ng-template>
+                      <ng-template #notWeightProduct>
+                        <p name="basketProduct.productCode" [(ngModel)]="basketProduct.productCount" ngDefaultControl>{{basketProduct.productCount}} {{basketProduct.productUnitName}}</p>
+                      </ng-template>                      
+                    </div>
+                    <div class="col-2">
+                      <fa-icon [icon]="faPlus" (click) = "addBasketThisProduct(basketProduct)"></fa-icon>
+                    </div>                                        
+                  </div>
+              </div>
+          </div>     
+          <div class="col-3">
+              <div class="basketProductTotalSumm">
+                  {{basketProduct.productSumm | number:'':'fr'}} тг.
+              </div>
+              <div class="basketProductPrice">
+                  {{basketProduct.productPrice | number:'':'fr'}} тг/{{basketProduct.productUnitName}}.
+              </div>            
+          </div>
+          <div class="col-1">
+              <sup class="basketClose" (click) = "basketClose(basketProduct)">X</sup>
+          </div>
+        </div>   
+      </ng-template>   
+      <ng-template #viewOrderSender>
+
+      </ng-template>   
+    </div>     
+</div>

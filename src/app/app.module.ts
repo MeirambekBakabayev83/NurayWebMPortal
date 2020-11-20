@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
 import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -26,9 +28,11 @@ import { NgxMaskModule, IConfig } from 'ngx-mask';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select'; 
 import { MatInputModule } from '@angular/material/input';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDatepickerModule } from '@angular/material/datepicker'; 
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatRadioModule } from '@angular/material/radio'; 
 import { BuyerRegistrationComponent } from './components/buyer-registration/buyer-registration.component';
 import { DedliveryAddressesComponent } from './components/dedlivery-addresses/dedlivery-addresses.component';
 import { SubProductGroupsComponent } from './components/sub-product-groups/sub-product-groups.component';
@@ -36,6 +40,7 @@ import { ProductDetailsComponent } from './components/product-details/product-de
 
 polyfill();
 enableProdMode();
+registerLocaleData(localeFr, 'fr');
 
 // определение маршрутов
 const appRoutes: Routes =[
@@ -80,9 +85,11 @@ const maskConfig: Partial<IConfig> = {
     MatSelectModule,
     NgxSpinnerModule,
     MatInputModule,
+    MatExpansionModule,
     MatDatepickerModule,
     MatNativeDateModule,
     MatMomentDateModule,
+    MatRadioModule,    
     NgxMaskModule.forRoot(maskConfig)
   ],
   providers: [AppGuard],

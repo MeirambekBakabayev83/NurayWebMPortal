@@ -42,7 +42,8 @@ export class HomeComponent implements OnInit {
   dtOptions: DataTables.Settings = {};  
   dtTrigger: Subject<any> = new Subject();
 
-  productGroups: ProductGroups[] = [];
+  //productGroups: ProductGroups[] = [];
+  productGroups: any;
   basketModel: Basket;
 
   errTxt: string;
@@ -53,8 +54,10 @@ export class HomeComponent implements OnInit {
 
   constructor(private onlineStoreService: OnlineStoreService, private http: HttpClient, private spinner: NgxSpinnerService, private router: Router) { }
 
-  ngOnInit(): void {
+  ngOnInit(): void {    
+
     this.getProductGroupList();
+    
   }
 
   getProductGroupList(){
@@ -63,7 +66,23 @@ export class HomeComponent implements OnInit {
     this.http.get(productGroupListUrl).subscribe((data:any) => 
     {
       this.productGroups=data; 
-      //console.log("this.productGroups: " + JSON.stringify(this.productGroups));
+
+      this.basketModel = this.onlineStoreService.getBasketModel();
+      
+
+      if (this.basketModel?.basketProducts){
+        for (let i = 0; i < this.productGroups.length; i ++){
+          for (let j = 0; j < this.productGroups[i].products.length; j ++){
+            if (this.basketModel.basketProducts.filter(x => x.productId == this.productGroups[i].products[j].productId).length > 0){
+              
+              this.productGroups[i].products[j].viewBasket = true; 
+              this.productGroups[i].products[j].productCount = this.basketModel.basketProducts.filter(x => x.productId == this.productGroups[i].products[j].productId)[0].productCount;
+              
+            }                  
+          }
+        }
+      }      
+
       this.spinner.hide();
     },
     error => 
@@ -73,7 +92,7 @@ export class HomeComponent implements OnInit {
       this.showGritterNotify( "error", "Ошибка при получении списка товаров");
       this.spinner.hide();      
     })    
-  }
+  }  
 
   installDesktopApp(){
     alert("SOON!!!");

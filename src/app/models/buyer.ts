@@ -8,4 +8,5 @@ export class BuyerVerify{
     sex: string; 
     birthDate: string;
     contactPhone: string;  
+    buyerCode: string;    
 }

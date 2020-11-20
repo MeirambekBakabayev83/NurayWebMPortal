@@ -29,6 +29,143 @@
         </div>    
     </div>
 </div>
-<div class="container">
-    <p>dedlivery-addresses works!</p>
+<div class="col-12" style="margin-bottom: 1px; margin-top: 20px; width: 100%;">
+    <div class="container">    
+        <div *ngIf="isViewDeliveryAddressList == true; then viewUserDeliveryAddresses else viewUserSaveDeliveryAddresses">
+        </div>      
+        <ng-template #viewUserSaveDeliveryAddresses>
+            <div class="row" style="margin-bottom: 1px; margin-top: 10px;">
+                <div class="col-12">
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 100%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Область <sup class="supCls">&nbsp;*</sup></mat-label>
+                        <mat-select [(value)]="deliveryRegionId" [disabled]="isRegionDisabled">                                        
+                            <mat-option *ngFor="let permissionObject of permissionsKatoObjects" [value]="permissionObject.katoId">
+                                {{permissionObject.katoRusName}}
+                            </mat-option> 
+                        </mat-select>
+                    </mat-form-field>                        
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 100%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Район <sup class="supCls">&nbsp;*</sup></mat-label>
+                        <mat-select [(value)]="deliveryDistrictId" (selectionChange)="getPermissionsAreaList($event.value)">                                        
+                            <mat-option *ngFor="let permissionDistrict of permissionsDistrictList" [value]="permissionDistrict.katoId">
+                                {{permissionDistrict.katoRusName}}
+                            </mat-option> 
+                        </mat-select>
+                    </mat-form-field>                        
+                </div>
+            </div>        
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 100%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Территориальная принадлежность <sup class="supCls">&nbsp;*</sup></mat-label>
+                        <mat-select [(value)]="deliveryAreaId" (selectionChange)="getPermissionsPlaceList($event.value)">                                        
+                            <mat-option *ngFor="let permissionArea of permissionsAreaList" [value]="permissionArea.katoId">
+                                {{permissionArea.katoRusName}}
+                            </mat-option> 
+                        </mat-select>
+                    </mat-form-field>                        
+                </div>
+            </div>                
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 100%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Населенный пункт <sup class="supCls">&nbsp;*</sup></mat-label>
+                        <mat-select [(value)]="deliveryPlaceId" >                                        
+                            <mat-option *ngFor="let permissionPlace of permissionsPlaceList" [value]="permissionPlace.katoId">
+                                {{permissionPlace.katoRusName}}
+                            </mat-option> 
+                        </mat-select>
+                    </mat-form-field>                        
+                </div>
+            </div>           
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 100%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Улица <sup class="supCls">&nbsp;*</sup></mat-label>
+                        <div class="ui-widget">                    
+                            <input matInput id="txtDeliveryStreet" [(ngModel)]="deliveryStreet"  placeholder="Улица">
+                        </div>                                    
+                    </mat-form-field>                                           
+                </div>
+            </div>        
+            <div class="row">
+                <div class="col-6">
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 100%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Номер дома <sup class="supCls">&nbsp;*</sup></mat-label>
+                        <div class="ui-widget">                    
+                            <input matInput id="txtDeliveryHouseNumber" [(ngModel)]="deliveryHouseNumber"  placeholder="Номер дома">
+                        </div>                                    
+                    </mat-form-field>                                           
+                </div>
+                <div class="col-6">
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 100%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Номер квартиры</mat-label>
+                        <div class="ui-widget">                    
+                            <input matInput id="txtDeliveryFlatNumber" [(ngModel)]="deliveryFlatNumber"  placeholder="Номер квартиры">
+                        </div>                                    
+                    </mat-form-field>                                           
+                </div>            
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 100%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Краткое обозначение <sup class="supCls">&nbsp;*</sup></mat-label>
+                        <div class="ui-widget">                    
+                            <input matInput id="txtPlaceName" [(ngModel)]="deliveryPlaceName"  placeholder="Краткое обозначение, например дом, дом родителей, работа и т.д. и т.п.">
+                        </div>                                    
+                    </mat-form-field>                                           
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button id="btnSaveDeliveryAddress" class="btn btn-primary" style="width: 100%;" (click)="saveDeliveryAddress()">
+                        <fa-icon [icon]="faSave" size="1x"></fa-icon>&nbsp;
+                        Сохранить
+                    </button>
+                </div>            
+            </div>              
+        </ng-template>
+
+        <ng-template #viewUserDeliveryAddresses>            
+            
+            <mat-accordion                
+                [multi]="false"
+                #accordion="matAccordion"
+            >
+                <mat-expansion-panel                     
+                    *ngFor="let deliveryAddress of userDeliveryAddresses"
+                >
+                    
+                    <mat-expansion-panel-header class="card-header">                        
+                        <mat-panel-title>                                
+                            <b>{{deliveryAddress.addressNote}}</b>                                                 
+                        </mat-panel-title>                        
+                    </mat-expansion-panel-header>                        
+
+                    <div class="card-body">
+                        <p>{{deliveryAddress.rusFullAddress}}</p>
+                    </div>                    
+
+                    <mat-action-row style= "padding: 16px 8px 16px 8px;">
+                        <div class="col-6">
+                            <button mat-button class="btn btn-primary" style="width: 100%;" (click)="correctDeliveryAddress(deliveryAddress.udaId)">                                
+                                Редактировать
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button mat-button class="btn btn-danger" style="width: 100%;" (click)="delDeliveryAddress(deliveryAddress.udaId)">                                
+                                Удалить
+                            </button>
+                        </div>                        
+                    </mat-action-row>
+
+                </mat-expansion-panel>
+            </mat-accordion>
+
+        </ng-template>
+    </div>
 </div>

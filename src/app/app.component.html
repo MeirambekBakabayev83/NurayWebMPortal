@@ -40,9 +40,10 @@
           </div> 
         </div>
         <div class="col-3">
-          <div class="footerIconCls">
+          <div class="footerIconCls">            
             <fa-icon [icon]="faShoppingCart" size="2x" (click) = "goBuyerBasket()"></fa-icon>
-            Корзина: {{basketModel.productsTotalCount}}
+            <sup class="basketSupClass">{{basketModel.productsTotalCount}}</sup>
+            Корзина 
           </div> 
         </div>             
         <div class="col-3">

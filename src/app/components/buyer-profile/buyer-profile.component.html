@@ -16,17 +16,43 @@
                 <text style="font-size: 1em; color: mediumblue;">Укажите электронную почту <sup style="color: crimson;">*</sup></text>
                 <input class="form-control" type="email" id="buyerEMail" name="buyerEMail" [(ngModel)]="buyerVerifyModel.eMail" #buyerEMail="ngModel" 
                 placeholder="example@gmail.com" style="display: inline-block !important; width: 98%;" required email>                       
-            </div> 
+            </div>   
+        </div>                
+        <div class="col-12">   
             <div class="form-group">
                 <div class="col-12" style="margin-bottom: 5px; margin-top: 1px; text-align: center; line-height: 15px;">
-                    <text style="font-size: 0.8em; color: crimson; font-weight: 500;">На указанный Вами почтовый адрес будет направлен код идентификаций клиента для последующей, полноценной работы в интернет - магазине. Входящее письмо может быть доставлено в другие папки, просим проверить внимательно. Спасибо что Вы с нами!</text>
+                    <text style="font-size: 0.8em; color: crimson; font-weight: 500;">На указанный Вами почтовый адрес будет направлен код идентификаций клиента для последующей, полноценной работы в интернет - магазине. Входящее письмо может быть доставлено в другие папки, просим проверить внимательно. Спасибо за то что Вы с нами!</text>
                 </div>
-            </div>
-            <div class="form-group">
+            </div>            
+            <div class="form-group" *ngIf="isCheckBuyerEMail == 0">
                 <div class="col-12" style="text-align: center; margin-top: 10px;">            
-                    <button id="btnRegistered" [disabled]="buyerEMail.invalid" class="btn btn-success" style="width: 150px;" (click) = "sendEMailForGetVerifyCode()">Получить код</button>
+                    <button id="btnCheckLoginBuyer" [disabled]="buyerEMail.invalid" class="btn btn-primary" style="width: 150px;" (click) = "checkBuyerLogin()">Далее</button>
                 </div>
-            </div>                    
-        </div>                
+            </div>                              
+            
+            <div *ngIf="isCheckBuyerEMail == 1">
+                <div class="form-group">
+                    <div class="col-12" style="text-align: center;">
+                        <input type="password" mask="9" id="fPIN" name="fPIN" class="form-control" [(ngModel)]="fPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('sPIN')" (focus)="onFocus('fPIN')"> &nbsp;
+                        <input type="password" mask="9" id="sPIN" name="sPIN" class="form-control" [(ngModel)]="sPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('thPIN')" (focus)="onFocus('sPIN')"> &nbsp;
+                        <input type="password" mask="9" id="thPIN" name="thPIN" class="form-control" [(ngModel)]="thPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (input)="chgFCode('fourPIN')" (focus)="onFocus('thPIN')"> &nbsp;
+                        <input type="password" mask="9" id="fourPIN" name="fourPIN" class="form-control" [(ngModel)]="fourPIN" style="display: inline-block !important; width: 37px;" maxlength="1" (focus)="onFocus('fourPIN')"> &nbsp;                        
+                    </div>                         
+                </div>              
+                <div class="form-group">
+                    <div class="col-12" style="text-align: center; margin-top: 10px;">            
+                        <button id="btnEnterBuyerPass" class="btn btn-primary" style="width: 150px;" (click) = "checkBuyerPsw()">Далее</button>&nbsp;
+                        <button id="btnRegistered" [disabled]="buyerEMail.invalid" class="btn btn-success" style="width: 150px;" (click) = "sendEMailForGetVerifyCode()">Регистрация</button>
+                    </div>
+                </div>                  
+            </div>                                
+        
+            <div class="form-group" *ngIf="isCheckBuyerEMail == 2">
+                <div class="col-12" style="text-align: center; margin-top: 10px;">            
+                    <button id="btnRegistered" [disabled]="buyerEMail.invalid" class="btn btn-success" style="width: 150px;" (click) = "sendEMailForGetVerifyCode()">Регистрация</button>
+                </div>
+            </div>                  
+
+        </div>
     </div>
 </div>

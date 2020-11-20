@@ -47,27 +47,41 @@ export class BuyerRegistrationComponent implements OnInit {
   sendVerifyEMailResult: any;
   saveBuyerResult: any;
   errTxt: string;  
+  buyerData: any;
 
   //phoneMask = ['(', /999/, ')', ' ', /999/, ' ',   /99/, ' ',  /99/];
   phoneMask = [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/];
 
   constructor(private http: HttpClient, private onlineStoreService: OnlineStoreService, private router: Router, private renderer: Renderer2, private spinner: NgxSpinnerService
-             , private dateAdapter: DateAdapter<any>) { 
+             , private dateAdapter: DateAdapter<Date>) { 
     this.buyerVerifyModel.firstName = "";
     this.buyerVerifyModel.name = "";
     this.buyerVerifyModel.lastName = "";
+    this.dateAdapter.setLocale('ru-RU');
   }
 
-  ngOnInit(): void {            
+  ngOnInit(): void {         
+    
+    this.onlineStoreService.buyerDatas$.subscribe(buyerDatas => {
+      this.buyerData = buyerDatas;            
+    })    
+    
     this.buyerVerifyModel = this.onlineStoreService.getBuyerVerifyModel();    
-    this.buyerVerifyModel.firstName = "";
-    this.buyerVerifyModel.name = "";
-    this.buyerVerifyModel.lastName = "";
-    this.buyerVerifyModel.sex = "U";
-    this.buyerVerifyModel.birthDate = "";
-    this.buyerVerifyModel.contactPhone = "";
 
-    this.dateAdapter.setLocale('ru');
+    if ((this.buyerVerifyModel.buyerCode) && (this.buyerVerifyModel.buyerCode != "")) {
+      this.isBuyerSave = true;
+      this.isAuthView = false;
+    }
+    else {
+      this.buyerVerifyModel.firstName = "";
+      this.buyerVerifyModel.name = "";
+      this.buyerVerifyModel.lastName = "";
+      this.buyerVerifyModel.sex = "U";
+      this.buyerVerifyModel.birthDate = "";
+      this.buyerVerifyModel.contactPhone = "";
+      this.isBuyerSave = false;
+      this.isAuthView = true;
+    }    
   }
 
   goBack(){
@@ -114,9 +128,11 @@ export class BuyerRegistrationComponent implements OnInit {
     this.http.post<any>(saveBuyerUrl, this.buyerVerifyModel
     ).subscribe((data:any) => {
       this.saveBuyerResult = data;
-      if ((this.saveBuyerResult.errCode == 0) || (this.saveBuyerResult.errCode == "0")) {
-        this.spinner.hide();
+      if ((this.saveBuyerResult.errCode == 0) || (this.saveBuyerResult.errCode == "0")) {        
+        this.onlineStoreService.setBuyerVerify(this.buyerVerifyModel);
+        localStorage.setItem("buyerLogin", this.buyerVerifyModel.eMail);  
         this.isBuyerSave = true;
+        this.spinner.hide();
         this.showGritterNotify( "ERROR", "Сохранение завершено успешно!");
       }
       else {

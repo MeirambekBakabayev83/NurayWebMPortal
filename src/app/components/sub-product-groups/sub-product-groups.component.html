@@ -24,7 +24,7 @@
                     <img src={{product.productPhotoUrl}}  alt={{product.productNameRus}} title={{product.productNameRus}} style="height: 13vh; padding-top: 5px;">
                   </div>         
                   <div class="priceDiv">
-                    {{product.productRetailPrice}} т.
+                    {{product.productRetailPrice | number:'':'fr'}} т.
                   </div>   
                   <div class="nameDiv">
                     {{product.productNameRus}}, {{product.productUnitName}}
@@ -45,7 +45,7 @@
                         <div class="col-6">                      
                           <div *ngIf="product.isWeight == 0; then notWeightProduct else weightProduct"></div>
                           <ng-template #weightProduct>
-                            <p name="product.productCode" [(ngModel)]="product.productCount" ngDefaultControl>{{product.productCount | number:'1.1'}} {{product.productUnitName}}</p>
+                            <p name="product.productCode" [(ngModel)]="product.productCount" ngDefaultControl>{{product.productCount | number:'.1'}} {{product.productUnitName}}</p>
                           </ng-template>
                           <ng-template #notWeightProduct>
                             <p name="product.productCode" [(ngModel)]="product.productCount" ngDefaultControl>{{product.productCount}} {{product.productUnitName}}</p>

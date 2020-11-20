@@ -9,6 +9,7 @@ import { ProductGroups } from 'src/app/models/productGroup';
 import { ViewEncapsulation } from '@angular/core';
 import { OwlOptions } from 'ngx-owl-carousel-o';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
+import { Basket } from 'src/app/models/basket';
 declare var $: any;
 
 @Component({
@@ -42,6 +43,7 @@ export class SubProductGroupsComponent implements OnInit, AfterViewInit {
   errTxt: string;
   productGroups: any;
   subGroupProducts: any;
+  basketModel: Basket;
 
   constructor(private activateRoute: ActivatedRoute, private router: Router, private http: HttpClient, private spinner: NgxSpinnerService, private onlineStoreService: OnlineStoreService) { 
     this.productGroupId = this.activateRoute.snapshot.params['productGroupId'];        
@@ -105,7 +107,21 @@ export class SubProductGroupsComponent implements OnInit, AfterViewInit {
         this.selectedProductGroupId = this.productGroups[0].productGroupId;
       }        
   
-      console.log("this.selectedProductGroupId: " + this.selectedProductGroupId) ;
+      this.basketModel = this.onlineStoreService.getBasketModel();
+      
+
+      if (this.basketModel?.basketProducts){
+        for (let i = 0; i < this.productGroups.length; i ++){
+          for (let j = 0; j < this.productGroups[i].products.length; j ++){
+            if (this.basketModel.basketProducts.filter(x => x.productId == this.productGroups[i].products[j].productId).length > 0){
+              
+              this.productGroups[i].products[j].viewBasket = true; 
+              this.productGroups[i].products[j].productCount = this.basketModel.basketProducts.filter(x => x.productId == this.productGroups[i].products[j].productId)[0].productCount;
+              
+            }                  
+          }
+        }
+      }
 
       this.spinner.hide();
     },

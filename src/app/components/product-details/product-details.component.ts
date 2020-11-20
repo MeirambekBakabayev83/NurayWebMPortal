@@ -9,6 +9,7 @@ import { ProductGroups } from 'src/app/models/productGroup';
 import { ViewEncapsulation } from '@angular/core';
 import { OwlOptions } from 'ngx-owl-carousel-o';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
+import { Basket } from 'src/app/models/basket';
 declare var $: any;
 
 @Component({
@@ -27,12 +28,17 @@ export class ProductDetailsComponent implements OnInit {
   selectedProductData: any;
   errTxt: string;
 
+  basketModel: Basket = new Basket();
+
   constructor(private activateRoute: ActivatedRoute, private router: Router, private http: HttpClient, private spinner: NgxSpinnerService, private onlineStoreService: OnlineStoreService) {
-    this.productCode = this.activateRoute.snapshot.params['productCode'];        
-    this.getProductGroupList();
+    this.productCode = this.activateRoute.snapshot.params['productCode'];            
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void {        
+
+    this.basketModel = this.onlineStoreService.getBasketModel();
+
+    this.getProductGroupList();    
     
   }
 
@@ -42,7 +48,14 @@ export class ProductDetailsComponent implements OnInit {
     this.http.get(productGroupListUrl).subscribe((data:any) => 
     {
       this.selectedProductData=data; 
-      //console.log("this.productGroups: " + JSON.stringify(this.productGroups));
+
+      if (this.basketModel?.basketProducts){
+        if (this.basketModel.basketProducts.filter(x => x.productId == this.selectedProductData.productId).length > 0){
+          this.selectedProductData.viewBasket = true; 
+          this.selectedProductData.productCount = this.basketModel.basketProducts.filter(x => x.productId == this.selectedProductData.productId)[0].productCount;
+        }                  
+      }      
+
       this.spinner.hide();
     },
     error => 
