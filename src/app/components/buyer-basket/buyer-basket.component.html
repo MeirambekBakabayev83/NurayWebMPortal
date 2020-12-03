@@ -15,24 +15,24 @@
           Сумма покупки: {{basketModel.productsTotalSumm | number:'':'fr'}} тг.
         </div>                    
         <div class="row" style="text-align: center; padding: 0 10px; position: relative;">
-          <div class="col-6">
+          <div class="col-12">
             <button id="btnSendOrder" class="btn btn-primary" style="width: 100%;" (click)="sendOrder()">Оформить заказ</button>
           </div>
-          <div class="col-6">
+          <!--<div class="col-6">
             <button id="btnClearOrder" class="btn btn-danger" style="width: 100%;" (click)="clearOrder()">Очистить</button>
-          </div>                    
+          </div>                    -->
         </div>              
       </div>      
     </ng-template> 
     <ng-template #viewOrderCommand>
       <div class="basketFinishOrderSumm">
         <div class="row" style="text-align: center; padding: 0 10px; margin-top: 5px; position: relative;">
-          <div class="col-6">
+          <div class="col-12">
             <button id="btnSendFinishOrder" class="btn btn-primary" style="width: 100%;" (click)="finishSendOrder()">Оформить заказ</button>
           </div>
-          <div class="col-6">
+          <!--<div class="col-6">
             <button id="btnListBasket" class="btn btn-danger" style="width: 100%;" (click)="viewListBasket()">К списку</button>
-          </div>                    
+          </div> -->                   
         </div>                
         <div class="row" style="padding-left: 20px; margin-top: 10px;">
           <div class="col-6">

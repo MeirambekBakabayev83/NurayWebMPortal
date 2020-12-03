@@ -9,4 +9,6 @@ export class BuyerVerify{
     birthDate: string;
     contactPhone: string;  
     buyerCode: string;    
+    isEmployees: number;
+    isPartners: number;
 }

@@ -39,10 +39,32 @@
             <div class="productContainer">
               <div class="mainPageImgDiv" (click)="goToProductDetails(product.productCode)">
                 <img src={{product.productPhotoUrl}}  alt={{product.productNameRus}} title={{product.productNameRus}} style="height: 13vh; padding-top: 5px;">
-              </div>         
-              <div class="priceDiv">
-                {{product.productRetailPrice | number:'':'fr'}} т.
-              </div>   
+              </div>    
+              <div *ngIf="buyerVerifyModel?.isEmployees==1; then employeesBlock else notEmployeesBlock"></div> 
+              <ng-template #employeesBlock>    
+                <div class="row priceDiv">
+                  <div class="col-6">
+                    {{product.productRetailPrice | number:'':'fr'}} т.
+                  </div>
+                  <div class="col-6">
+                    {{product.productBulkPrice | number:'':'fr'}} т.
+                  </div>                 
+                </div>
+              </ng-template>
+              <ng-template #notEmployeesBlock>    
+                <div *ngIf="buyerVerifyModel?.isPartners==1; then partnersBlock else notPartnersBlock"></div>
+                <ng-template #partnersBlock> 
+                  <div class="priceDiv">
+                    {{product.productBulkPrice | number:'':'fr'}} т.
+                  </div>   
+                </ng-template>
+                <ng-template #notPartnersBlock> 
+                  <div class="priceDiv">
+                    {{product.productRetailPrice | number:'':'fr'}} т.
+                  </div>                  
+                </ng-template>
+              </ng-template>
+                            
               <div class="nameDiv">
                 {{product.productNameRus}}, {{product.productUnitName}}
               </div>

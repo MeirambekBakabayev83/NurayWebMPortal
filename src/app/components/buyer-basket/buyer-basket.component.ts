@@ -28,18 +28,36 @@ export class BuyerBasketComponent implements OnInit {
   buyerVerifyModel: BuyerVerify = new BuyerVerify();
   isSendOrder: boolean = false;
   isSlectedDeliveryAddress: boolean = false;
-  methodDelvery: number;
-  deliveryAddressId: number;
+  methodDelvery: number = 0;
+  deliveryAddressId: number = 0;
   userDeliveryAddressList: any;
   selectedDeliveryAddress: any;
   errTxt: string;
   buyerOrderData: any;
-  udaID: number;
+  udaID: number = 0;
 
   constructor(private activateRoute: ActivatedRoute, private router: Router, private http: HttpClient, private spinner: NgxSpinnerService, private onlineStoreService: OnlineStoreService) { }
 
   ngOnInit(): void {    
     this.basketModel = this.onlineStoreService.getBasketModel();    
+    console.log("test:" + JSON.stringify(this.basketModel));
+
+
+    this.onlineStoreService.goToClearBasket(false);
+    if (!this.basketModel?.basketProducts){
+      this.onlineStoreService.goToClearBasket(false);
+    }
+
+    if (this.basketModel.basketProducts != null){
+      if (this.basketModel.basketProducts.length == 0){
+        this.onlineStoreService.goToClearBasket(false);
+      }            
+    }
+
+    this.onlineStoreService.isSendOrder$.subscribe(senderOrder => {        
+      this.isSendOrder = senderOrder;
+    })    
+
   }
 
   delBasketThisProduct(item: any) {                  
@@ -79,8 +97,13 @@ export class BuyerBasketComponent implements OnInit {
   }
 
   sendOrder(){
+    
+    if (!this.basketModel?.basketProducts){
+      this.showGritterNotify( "error", "Корзина пустая. Необходимо выбрать товары для оформления заказа. ");  
+      return;
+    }  
 
-    if (this.basketModel.basketProducts.length == 0){
+    if (this.basketModel?.basketProducts.length == 0){
       this.showGritterNotify( "error", "Корзина пустая. Необходимо выбрать товары для оформления заказа. ");  
       return;
     }  
@@ -89,10 +112,25 @@ export class BuyerBasketComponent implements OnInit {
     this.buyerVerifyModel = this.onlineStoreService.getBuyerVerifyModel();
     this.basketModel.buyerModel = this.buyerVerifyModel;
     this.onlineStoreService.setBasketModel(this.basketModel);
+    this.onlineStoreService.goToClearBasket(false);
+    this.onlineStoreService.goToBasketList(true);
     this.getUserDeliveryAddresses();
   }
 
   finishSendOrder(){
+
+    if (this.methodDelvery == 0){
+      this.showGritterNotify( "error", "Необходимо выбрать метод получения заказа (Самовывоз или доставка). ");  
+      return;
+    }      
+
+    if (this.methodDelvery == 2){
+      if (this.udaID == 0){
+        this.showGritterNotify( "error", "Адрес доставки не выбран. Если у Вас пустой список адресов доставки, то предварительно необходимо составить их в порфиле пользователя.");  
+        return;
+      }
+    }
+
     this.spinner.show();  
     
     this.basketModel.deliveryType = this.methodDelvery;
@@ -117,9 +155,12 @@ export class BuyerBasketComponent implements OnInit {
     this.http.post<any>(saveBuyerOrderUrl, this.basketModel
     ).subscribe((data:any) => { 
       this.buyerOrderData = data; 
+      console.log("this.buyerOrderData: " + JSON.stringify(this.buyerOrderData));
       if ((this.buyerOrderData.errCode != null) && (this.buyerOrderData.errCode == 0)){        
         this.spinner.hide();
-        this.showGritterNotify( "ERROR", "Ваш заказ сохранен успешно! В самое ближайшее время наши сотрудники службы онлайн доставки свяжутся с Вами. Спасибо за покупку!");                                                    
+        this.onlineStoreService.clearBasketModel();
+        this.showGritterNotify( "ERROR", "Ваш заказ сохранен успешно! В самое ближайшее время наши сотрудники службы онлайн доставки свяжутся с Вами. Спасибо за покупку!"); 
+        this.router.navigate(["home"]);                                                   
       }
       else {
         this.showGritterNotify( "ERROR", "Ошибка при сохранении заказа!");                                                    
@@ -141,6 +182,7 @@ export class BuyerBasketComponent implements OnInit {
 
   viewListBasket(){
     this.isSendOrder = false;
+    this.onlineStoreService.goToClearBasket(true);
   }
 
   goToProductDetails(productCode){

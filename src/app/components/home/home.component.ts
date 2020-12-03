@@ -9,9 +9,9 @@ import { NgxSpinnerService } from "ngx-spinner";
 import { ProductGroups } from 'src/app/models/productGroup';
 import { Basket } from 'src/app/models/basket';
 import { environment } from 'src/environments/environment';
-import { MatCarousel, MatCarouselComponent } from '@ngmodule/material-carousel';
 import { OwlOptions } from 'ngx-owl-carousel-o';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
+import { BuyerVerify } from 'src/app/models/buyer';
 declare var $: any;
 
 @Component({
@@ -32,7 +32,7 @@ export class HomeComponent implements OnInit {
     navSpeed: 700,
     navText: ['', ''],
     margin:10, 
-    items: 1,   
+    items: 2,   
     autoWidth: true,        
     nav: false,    
   }
@@ -41,6 +41,8 @@ export class HomeComponent implements OnInit {
   dtElement: DataTableDirective;
   dtOptions: DataTables.Settings = {};  
   dtTrigger: Subject<any> = new Subject();
+
+  buyerVerifyModel: BuyerVerify = new BuyerVerify();
 
   //productGroups: ProductGroups[] = [];
   productGroups: any;
@@ -57,7 +59,19 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {    
 
     this.getProductGroupList();
-    
+    this.onlineStoreService.goToClearBasket(false);
+    this.onlineStoreService.goToBasketList(false);
+
+    this.onlineStoreService.isBuyerVerify$.subscribe(buyerData => {
+      this.buyerVerifyModel = buyerData;                  
+    })   
+
+    if (this.buyerVerifyModel.eMail==null){
+      this.buyerVerifyModel = this.onlineStoreService.getBuyerVerifyModel();      
+    }    
+
+    console.log("this.buyerVerifyModel: " + JSON.stringify(this.buyerVerifyModel));
+        
   }
 
   getProductGroupList(){

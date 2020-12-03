@@ -18,6 +18,7 @@ export class BasketProduct{
     productId: number;
     productCode: string;
     productPrice: number;
+    productBulkPrice: number;
     productCount: number;
     productSumm: number;
     productName: string;

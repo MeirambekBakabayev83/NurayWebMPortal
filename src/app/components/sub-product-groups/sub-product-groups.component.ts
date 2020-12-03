@@ -5,11 +5,11 @@ import { OnlineStoreService } from 'src/app/services/online-store.service';
 import { Subject } from 'rxjs';
 import { NgxSpinnerService } from "ngx-spinner";
 import { environment } from 'src/environments/environment';
-import { ProductGroups } from 'src/app/models/productGroup';
 import { ViewEncapsulation } from '@angular/core';
 import { OwlOptions } from 'ngx-owl-carousel-o';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
 import { Basket } from 'src/app/models/basket';
+import { BuyerVerify } from 'src/app/models/buyer';
 declare var $: any;
 
 @Component({
@@ -33,7 +33,7 @@ export class SubProductGroupsComponent implements OnInit, AfterViewInit {
     margin:5,    
     navSpeed: 700,
     navText: ['', ''], 
-    items: 1,   
+    items: 2,   
     autoWidth: true,        
     nav: false
   }
@@ -44,6 +44,7 @@ export class SubProductGroupsComponent implements OnInit, AfterViewInit {
   productGroups: any;
   subGroupProducts: any;
   basketModel: Basket;
+  buyerVerifyModel: BuyerVerify = new BuyerVerify();
 
   constructor(private activateRoute: ActivatedRoute, private router: Router, private http: HttpClient, private spinner: NgxSpinnerService, private onlineStoreService: OnlineStoreService) { 
     this.productGroupId = this.activateRoute.snapshot.params['productGroupId'];        
@@ -52,6 +53,13 @@ export class SubProductGroupsComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
 
     this.onlineStoreService.goToReturn("home");
+
+    /*this.onlineStoreService.isBuyerVerify$.subscribe(buyerData => {
+      this.buyerVerifyModel = buyerData;                  
+    })    */
+
+    this.buyerVerifyModel = this.onlineStoreService.getBuyerVerifyModel();
+
   }  
 
   ngAfterViewInit(): void{
@@ -65,6 +73,7 @@ export class SubProductGroupsComponent implements OnInit, AfterViewInit {
   addBasket(item: any){
     this.onlineStoreService.fillBasketModel(item);          
     item.viewBasket =true;    
+    console.log(JSON.stringify(item))
   }
 
   addBasketThisProduct(item: any) {

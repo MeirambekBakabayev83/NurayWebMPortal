@@ -4,6 +4,7 @@ import { NgModule, NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/cor
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { FormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -36,7 +37,9 @@ import { MatRadioModule } from '@angular/material/radio';
 import { BuyerRegistrationComponent } from './components/buyer-registration/buyer-registration.component';
 import { DedliveryAddressesComponent } from './components/dedlivery-addresses/dedlivery-addresses.component';
 import { SubProductGroupsComponent } from './components/sub-product-groups/sub-product-groups.component';
-import { ProductDetailsComponent } from './components/product-details/product-details.component'; 
+import { ProductDetailsComponent } from './components/product-details/product-details.component';
+import { LeftNavMenuComponent } from './components/left-nav-menu/left-nav-menu.component';
+import { BuyerSettingsComponent } from './components/buyer-settings/buyer-settings.component'; 
 
 polyfill();
 enableProdMode();
@@ -48,6 +51,7 @@ const appRoutes: Routes =[
   { path: 'home', runGuardsAndResolvers: "always", component: HomeComponent,  pathMatch:'full'},   
   { path: 'categoriesList', canActivate: [AppGuard], component: CategoriesComponent,  pathMatch:'full'},   
   { path: 'buyerBasket', canActivate: [AppGuard], component: BuyerBasketComponent,  pathMatch:'full'},   
+  { path: 'buyerSetting', canActivate: [AppGuard], component: BuyerSettingsComponent,  pathMatch:'full'},   
   { path: 'buyerProfile', canActivate: [AppGuard], component: BuyerProfileComponent,  pathMatch:'full'},   
   { path: 'buyerRegistration', canActivate: [AppGuard], component: BuyerRegistrationComponent,  pathMatch:'full'},   
   { path: 'deliveryAdresses', canActivate: [AppGuard], component: DedliveryAddressesComponent,  pathMatch:'full'},   
@@ -63,7 +67,7 @@ const maskConfig: Partial<IConfig> = {
 @NgModule({
   declarations: [    
     AppComponent,    
-    HomeComponent, CategoriesComponent, BuyerBasketComponent, BuyerProfileComponent, BuyerRegistrationComponent, DedliveryAddressesComponent, SubProductGroupsComponent, ProductDetailsComponent
+    HomeComponent, CategoriesComponent, BuyerBasketComponent, BuyerProfileComponent, BuyerRegistrationComponent, DedliveryAddressesComponent, SubProductGroupsComponent, ProductDetailsComponent, LeftNavMenuComponent, BuyerSettingsComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA
@@ -73,6 +77,7 @@ const maskConfig: Partial<IConfig> = {
     AppRoutingModule,
     CommonModule,        
     FormsModule,
+    NgbModule,
     RouterModule.forRoot(appRoutes, {onSameUrlNavigation: "reload", useHash: true}),
     HttpClientModule,
     AppRoutingModule,        

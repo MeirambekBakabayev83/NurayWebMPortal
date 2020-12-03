@@ -61,6 +61,8 @@ export class BuyerProfileComponent implements OnInit {
 
   ngOnInit(): void {
     //this.spinner.show(); 
+    this.onlineStoreService.goToClearBasket(false);
+    this.onlineStoreService.goToBasketList(false);
   }
 
   checkBuyerLogin(){ 

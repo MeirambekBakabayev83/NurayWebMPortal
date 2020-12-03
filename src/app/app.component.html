@@ -3,20 +3,37 @@
     <div class="logoDiv">
       <div class="row">
         <div class="col-2">
-            <div class="returnBlock" *ngIf="isComBack" (click)="goToBack()">
+          <div class="returnBlock" *ngIf="isComBack" (click)="goToBack()">
               <!--<fa-icon [icon]="faBackspace"></fa-icon>&nbsp;-->
               Назад
-            </div>
+          </div>
         </div>
         <div class="col-8">
           <img src="assets/img/nurai_logo.png" rel="noreferrer"/>            
         </div>             
         <div class="col-2">
-
+          <div class="clearBlock" *ngIf="isClearBasket" (click)="clearOrder()">
+            <!--<fa-icon [icon]="faBackspace"></fa-icon>&nbsp;-->
+            Очистить
+          </div>
+          <div class="clearBlock" *ngIf="isReturnBasketList" (click)="viewListBasket()">
+            <!--<fa-icon [icon]="faBackspace"></fa-icon>&nbsp;-->
+            К списку
+          </div>          
         </div>           
       </div>
     </div>    
     <div class="searchDiv">
+      <div class="row">
+        <div class="col-2" style="padding: 12px 0 0 30px;">
+          <fa-icon [icon]="faBars" size="2x" style="color: #555555;" (click) = "showMainNav()"></fa-icon>
+        </div>
+        <div class="col-10 ui-widget" style="text-align: left;">
+          <mat-form-field class="example-full-width" style="width: 90%; font-size: 13px;">            
+            <input matInput id="warCode" [(ngModel)]="warCode" placeholder="Поиск товара по наименованию/штрих коду">
+          </mat-form-field>
+        </div>
+      </div>
     </div>
   </div>
   <div class="content">
@@ -35,8 +52,8 @@
         </div>
         <div class="col-3">
           <div class="footerIconCls">
-            <fa-icon [icon]="faBars" size="2x" (click) = "goProductCategories()"></fa-icon>
-            Категории
+            <fa-icon [icon]="faListUl" size="2x" (click) = "goProductCategories()"></fa-icon>
+            Заказы
           </div> 
         </div>
         <div class="col-3">

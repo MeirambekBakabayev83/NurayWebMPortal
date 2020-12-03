@@ -21,6 +21,15 @@ export class OnlineStoreService {
   private isReturnBack = new Subject<string>();
   isReturnBack$ = this.isReturnBack.asObservable(); 
 
+  private isClearBasket = new Subject<boolean>();
+  isClearBasket$ = this.isClearBasket.asObservable(); 
+
+  private isReturnBasketList = new Subject<boolean>();
+  isReturnBasketList$ = this.isReturnBasketList.asObservable();   
+
+  private isSendOrder = new Subject<boolean>();
+  isSendOrder$ = this.isSendOrder.asObservable();   
+
   private isBuyerVerify = new Subject<BuyerVerify>();
   isBuyerVerify$ = this.isBuyerVerify.asObservable();
 
@@ -31,7 +40,7 @@ export class OnlineStoreService {
     this.basketModel.productsTotalCount = 0;
     this.basketModel.productsTotalSumm = 0;
     this.basketModel.deliverySumm = 0;
-    this.basketModel.totalSumm = 0;
+    this.basketModel.totalSumm = 0;    
   }
 
   getProductgroupsList() : Observable<ProductGroups[]>{        
@@ -57,15 +66,42 @@ export class OnlineStoreService {
 
   goToReturn(routeName: string){    
     
-    this.isReturnBack.next(routeName);
+    this.isReturnBack.next(routeName);    
     
   }
+
+  goToClearBasket(isClearBasket: boolean){    
+    
+    this.isClearBasket.next(isClearBasket);    
+    
+  }
+
+  goToBasketList(isReturnBasketList: boolean){    
+    
+    this.isReturnBasketList.next(isReturnBasketList);    
+    
+  }  
+
+  goToSenderBasket(isSenderOrder: boolean){    
+    
+    this.isSendOrder.next(isSenderOrder);    
+    
+  }    
 
   fillBasketModel(productItem: any){          
 
     let basketProducts = [];              
 
     let itemProductCount = 0;
+
+    let itemProductPrise = 0;
+
+    if (this.buyerVerifyModel.isPartners == 1){
+      itemProductPrise = productItem.productBulkPrice;
+    }
+    else {
+      itemProductPrise = productItem.productRetailPrice;
+    }
 
     if (productItem.isWeight == 0) {
       itemProductCount = 1;
@@ -97,9 +133,9 @@ export class OnlineStoreService {
       {
         "productId": productItem.productId,
         "productCode": productItem.productCode,
-        "productPrice": productItem.productRetailPrice,
+        "productPrice": itemProductPrise,
         "productCount": itemProductCount,
-        "productSumm": (productItem.productRetailPrice ? itemProductCount * productItem.productRetailPrice : itemProductCount * productItem.productPrice),
+        "productSumm": (productItem.productRetailPrice ? itemProductCount * itemProductPrise : itemProductCount * productItem.productPrice),
         "productName": productItem.productNameRus,
         "productPhotoUrl": productItem.productPhotoUrl,
         "isWeight": productItem.isWeight,
@@ -128,6 +164,15 @@ export class OnlineStoreService {
 
     let index = null;
 
+    let itemProductPrise = 0;
+
+    if (this.buyerVerifyModel.isPartners == 1){
+      itemProductPrise = productItem.productBulkPrice;
+    }
+    else {
+      itemProductPrise = productItem.productRetailPrice;
+    }
+
     index = this.basketModel.basketProducts.findIndex(function (element) { 
       return element.productId == productItem.productId; 
     });
@@ -138,8 +183,8 @@ export class OnlineStoreService {
       this.basketModel.basketProducts[index].productId = productItem.productId;
       this.basketModel.basketProducts[index].productCount = Number(productItem.productCount.toFixed(1));
       //this.basketModel.basketProducts[index].productPrice = productItem.productRetailPrice;          
-      this.basketModel.basketProducts[index].productPrice = (productItem.productRetailPrice ? productItem.productRetailPrice: productItem.productPrice); 
-      this.basketModel.basketProducts[index].productSumm = (productItem.productRetailPrice ? productItem.productCount * productItem.productRetailPrice : productItem.productCount * productItem.productPrice);          
+      this.basketModel.basketProducts[index].productPrice = (productItem.productRetailPrice ? itemProductPrise: productItem.productPrice); 
+      this.basketModel.basketProducts[index].productSumm = (productItem.productRetailPrice ? productItem.productCount * itemProductPrise : productItem.productCount * productItem.productPrice);          
       this.basketModel.basketProducts[index].productName = (productItem.productNameRus ? productItem.productNameRus : productItem.productName);          
     }                                         
 
@@ -160,6 +205,15 @@ export class OnlineStoreService {
 
     let index = null;
 
+    let itemProductPrise = 0;
+
+    if (this.buyerVerifyModel.isPartners == 1){
+      itemProductPrise = productItem.productBulkPrice;
+    }
+    else {
+      itemProductPrise = productItem.productRetailPrice;
+    }
+
     index = this.basketModel.basketProducts.findIndex(function (element) { 
       return element.productId == productItem.productId; 
     });
@@ -167,9 +221,9 @@ export class OnlineStoreService {
     if (index !== -1) {
       this.basketModel.basketProducts[index].productId = productItem.productId;
       this.basketModel.basketProducts[index].productCount = Number((this.basketModel.basketProducts[index].productCount - minusProductCount).toFixed(1));
-      this.basketModel.basketProducts[index].productPrice = (productItem.productRetailPrice ? productItem.productRetailPrice: productItem.productPrice); 
+      this.basketModel.basketProducts[index].productPrice = (productItem.productRetailPrice ? itemProductPrise: productItem.productPrice); 
       //this.basketModel.basketProducts[index].productSumm = Number((this.basketModel.basketProducts[index].productCount * productItem.productRetailPrice).toFixed(2));                   
-      this.basketModel.basketProducts[index].productSumm = (productItem.productRetailPrice ? productItem.productCount * productItem.productRetailPrice : productItem.productCount * productItem.productPrice);
+      this.basketModel.basketProducts[index].productSumm = (productItem.productRetailPrice ? productItem.productCount * itemProductPrise : productItem.productCount * productItem.productPrice);
       this.basketModel.basketProducts[index].productName = (productItem.productNameRus ? productItem.productNameRus : productItem.productName);          
       productItem.productCount = this.basketModel.basketProducts[index].productCount;
       
@@ -206,7 +260,7 @@ export class OnlineStoreService {
 
   delItemBasketModel(productItem: any){              
 
-    let index = null;
+    let index = null;    
 
     index = this.basketModel.basketProducts.findIndex(function (element) { 
       return element.productId == productItem.productId; 

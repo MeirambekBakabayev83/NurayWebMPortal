@@ -13,10 +13,29 @@
                 <div class="productDetailContainer">
                     <div class="mainPageImgDiv">
                       <img src={{selectedProductData.productPhotoUrl}}  alt={{selectedProductData.productNameRus}} title={{selectedProductData.productNameRus}} style="height: 25vh; padding-top: 5px;">
-                    </div>         
-                    <div class="productDetailPriceDiv">
-                      {{selectedProductData.productRetailPrice | number:'':'fr'}} т.
-                    </div>   
+                    </div>       
+                    <div *ngIf="buyerVerifyModel?.isEmployees==1; then employeesBlock else notEmployeesBlock"></div> 
+                    <ng-template #employeesBlock>    
+                      <div class="productDetailPriceDiv">
+                        Розн. &nbsp;{{selectedProductData.productRetailPrice | number:'':'fr'}} т.
+                      </div>   
+                      <div class="productDetailBulkPriceDiv">
+                        Опт. &nbsp;&nbsp;{{selectedProductData.productBulkPrice | number:'':'fr'}} т.
+                      </div>   
+                    </ng-template>                      
+                    <ng-template #notEmployeesBlock>    
+                      <div *ngIf="buyerVerifyModel?.isPartners==1; then partnersBlock else notPartnersBlock"></div>
+                      <ng-template #partnersBlock> 
+                        <div class="productDetailPriceDiv">
+                          Опт. &nbsp;{{selectedProductData.productBulkPrice | number:'':'fr'}} т.
+                        </div>   
+                      </ng-template>
+                      <ng-template #notPartnersBlock> 
+                        <div class="productDetailPriceDiv">
+                          Розн. &nbsp;{{selectedProductData.productRetailPrice | number:'':'fr'}} т.
+                        </div>   
+                      </ng-template>
+                    </ng-template>
                     <div class="productDetailNameDiv">
                       {{selectedProductData.productNameRus}}, {{selectedProductData.productUnitName}}
                     </div>

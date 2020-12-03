@@ -10,6 +10,7 @@ import { ViewEncapsulation } from '@angular/core';
 import { OwlOptions } from 'ngx-owl-carousel-o';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
 import { Basket } from 'src/app/models/basket';
+import { BuyerVerify } from 'src/app/models/buyer';
 declare var $: any;
 
 @Component({
@@ -29,6 +30,7 @@ export class ProductDetailsComponent implements OnInit {
   errTxt: string;
 
   basketModel: Basket = new Basket();
+  buyerVerifyModel: BuyerVerify = new BuyerVerify();
 
   constructor(private activateRoute: ActivatedRoute, private router: Router, private http: HttpClient, private spinner: NgxSpinnerService, private onlineStoreService: OnlineStoreService) {
     this.productCode = this.activateRoute.snapshot.params['productCode'];            
@@ -39,6 +41,8 @@ export class ProductDetailsComponent implements OnInit {
     this.basketModel = this.onlineStoreService.getBasketModel();
 
     this.getProductGroupList();    
+
+    this.buyerVerifyModel = this.onlineStoreService.getBuyerVerifyModel();
     
   }
 
