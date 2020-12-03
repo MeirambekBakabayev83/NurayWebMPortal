@@ -78,7 +78,7 @@ const maskConfig: Partial<IConfig> = {
     CommonModule,        
     FormsModule,
     NgbModule,
-    RouterModule.forRoot(appRoutes, {onSameUrlNavigation: "reload", useHash: true}),
+    RouterModule.forRoot(appRoutes, { onSameUrlNavigation: "reload", useHash: true, relativeLinkResolution: 'legacy' }),
     HttpClientModule,
     AppRoutingModule,        
     BrowserAnimationsModule,  
