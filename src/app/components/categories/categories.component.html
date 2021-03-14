@@ -1,7 +1,252 @@
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            Страница заказов на стадии разработки
-        </div>
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.4)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+<div class="mainPGContent">    
+    <div *ngIf="isViewOrderWars; then viewOrderWarsList else notViewOrderWarsList">
     </div>
+    <ng-template #notViewOrderWarsList>
+        <div class="userOrderSearchPanel">
+            <div class="row" style="padding: 7px;">
+                <div class="col-6" >
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 98%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Номер заказа</mat-label>
+                        <input matInput [(ngModel)]="searchOrderNumber" placeholder="Номер заказа" autocomplete="off">                    
+                    </mat-form-field>
+                </div>
+                <div class="col-6" >
+                    <mat-form-field class="example-full-width" style="display: inline-block !important; width: 98%; font-size: 13px; font-weight: 500;">
+                        <mat-label>Дата заказа - ДД.ММ.ГГГГ</mat-label>
+                        <input matInput [matDatepicker]="orderDatePicker" [(ngModel)]="searchOrderDate" placeholder="Дата заказа ДД.ММ.ГГГГ" autocomplete="off">
+                        <mat-datepicker-toggle matSuffix [for]="orderDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #orderDatePicker></mat-datepicker>
+                    </mat-form-field>                
+                </div>            
+            </div>
+            <div class="row" style="padding: 7px;">
+                <div class="col-12" >
+                    <button id="btnSeearchOrder" class="btn btn-primary btn-sm" style="width: 100%;" (click)="searchOrder()">
+                        <fa-icon [icon]="faSearch" size="1x"></fa-icon>&nbsp;Найти
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="userOrdersCnt != 0; then viewOrderList else notViewOrderList">
+        </div>
+        <ng-template #viewOrderList>
+            <div class="userOrdersContainer">
+                <div class="userOrder" *ngFor="let order of userOrders">
+                    <div class="row">
+                        <div class="col-4" >
+                            <b>Номер заказа:</b>
+                        </div>
+                        <div class="col-6" >
+                            {{order.orderCode1c}}
+                        </div>                                                    
+                        <div class="col-2" >
+                            <fa-icon [icon]="faShare" size="2x" (click)="goToOrderDetails(order)"></fa-icon>
+                        </div>                                  
+                    </div>
+                    <div class="row">
+                        <div class="col-4" >
+                            <b>Дата заказа:</b>
+                        </div>
+                        <div class="col-6" >
+                            {{order.createTime | date:'dd.MM.yyyy hh:mm:ss':'fr'}}
+                        </div>              
+                        <div class="col-2" >
+    
+                        </div>              
+                    </div>            
+                    <div class="row">
+                        <div class="col-4" >
+                            <b>Сумма заказа:</b>
+                        </div>
+                        <div class="col-6" >
+                            <b>{{order.orderTotalSumm | number:'':'fr'}} тг.</b>
+                        </div>              
+                        <div class="col-2" >
+    
+                        </div>
+                    </div>                                    
+                </div>
+            </div>
+        </ng-template>    
+        <ng-template #notViewOrderList>
+            <div class="userOrdersContainer">
+                <div class="alert alert-warning" role="alert">
+                  Список заказов пустой!
+                </div>
+            </div>
+        </ng-template>
+    </ng-template>
+    <ng-template #viewOrderWarsList>
+        <div *ngIf="isViewOrderCancelled; then viewOrderCancelled else notViewOrderCancelled">
+        </div>  
+        <ng-template #viewOrderCancelled>
+            <div class="orderDetails">
+                <div class="row" style="padding-left: 20px;">
+                    <div class="col-10" >
+                        <div class="row">
+                            <div class="col-6" >
+                                Сумма покупки:
+                            </div>
+                            <div class="col-6" style="color: black; font-weight: 500;">
+                                {{orderSumm | number:'':'fr'}} тг.
+                            </div>
+                        </div>                     
+                    </div>
+                    <div class="col-2" >
+                        <fa-icon [icon]="faReply" size="1x" (click)="goToOrderList()" style="color: black !important;"></fa-icon>
+                    </div>                
+                </div>                    
+                <div class="row" style="padding-left: 20px;">
+                    <div class="col-10" >
+                        <div class="row">
+                            <div class="col-6" >
+                                Сумма доставки:
+                            </div>
+                            <div class="col-6" style="color: black; font-weight: 500;">
+                                {{orderDeliverySumm | number:'':'fr'}} тг.
+                            </div>
+                        </div>                                                    
+                    </div>
+                    <div class="col-2" >
+    
+                    </div>                              
+                </div>    
+                <div class="row" style="padding-left: 20px;">
+                    <div class="col-10" >
+                        <div class="row">
+                            <div class="col-6" >
+                                Статус заказа:
+                            </div>
+                            <div class="col-6" style="color: black; font-weight: 500;">
+                                {{userOrderStatusValue}}
+                            </div>
+                        </div>                                                    
+                    </div>
+                    <div class="col-2" >
+    
+                    </div>                              
+                </div>                   
+                
+                <div class="row" style="text-align: center; padding: 0 10px; position: relative;">
+                    <div class="col-12">
+                        <mat-form-field class="example-full-width" style="display: inline-block !important; width: 95%; font-size: 15px; font-weight: 500;">
+                            <mat-label>Причина отмены заказа <sup class="supCls">&nbsp;*</sup></mat-label>
+                            <mat-select [(value)]="orderCancelledReasonId">                                        
+                                <mat-option *ngFor="let ocr of orderCancelledReasonList" [value]="ocr.ocrId">
+                                    {{ocr.ocrRusName}}
+                                </mat-option> 
+                            </mat-select>
+                            </mat-form-field>                          
+                    </div>
+                </div>
+                <div class="row" style="text-align: center; padding: 0 10px; position: relative;">
+                    <div class="col-12">
+                        <button id="btnSendOrder" class="btn btn-primary btn-sm" style="width: 100%;" (click)="cancelledOrder()">Отменить заказ</button>
+                    </div>
+                    <!--<div class="col-6">
+                        <button id="btnClearOrder" class="btn btn-danger" style="width: 100%;" (click)="clearOrder()">Очистить</button>
+                    </div>                    -->
+                </div>                          
+    
+            </div> 
+            <div class="orderWarsContainer">
+                <div class="row orderWars" *ngFor="let orderProduct of userOrderWars">
+                    <div class="col-2 basketImgDiv" (click)="goToProductDetails(orderProduct.productEntity.productCode)">
+                        <img src={{orderProduct.productEntity.product_photos[0].fileUrl}}  alt={{orderProduct.productEntity.productNameRus}} title={{orderProduct.productEntity.productNameRus}} style="height: 7vh; padding-top: 5px;">
+                    </div>
+                    <div class="col-6">
+                        <div class="basketProductName" style="padding-top: 5px;">{{orderProduct.productEntity.productNameRus}}&nbsp; - &nbsp; <b>{{orderProduct.productCount}}&nbsp;{{orderProduct.productEntity.product_unit.productUnitRusName}}</b></div>                    
+                    </div>     
+                    <div class="col-3">
+                        <div class="basketProductTotalSumm">
+                            {{orderProduct.productSumm | number:'':'fr'}} тг.
+                        </div>
+                        <div class="basketProductPrice">
+                            {{orderProduct.productPrise | number:'':'fr'}} тг/{{orderProduct.productEntity.product_unit.productUnitRusName}}.
+                        </div>            
+                    </div>
+                    <div class="col-1">                
+                    </div>
+                </div>          
+            </div>            
+        </ng-template>
+        <ng-template #notViewOrderCancelled>
+            <div class="orderDetailsWithoutCancelled">
+                <div class="row" style="padding-left: 20px;">
+                    <div class="col-10" >
+                        <div class="row">
+                            <div class="col-6" >
+                                Сумма покупки:
+                            </div>
+                            <div class="col-6" style="color: black; font-weight: 500;">
+                                {{orderSumm | number:'':'fr'}} тг.
+                            </div>
+                        </div>                     
+                    </div>
+                    <div class="col-2" >
+                        <fa-icon [icon]="faReply" size="1x" (click)="goToOrderList()" style="color: black !important;"></fa-icon>
+                    </div>                
+                </div>                    
+                <div class="row" style="padding-left: 20px;">
+                    <div class="col-10" >
+                        <div class="row">
+                            <div class="col-6" >
+                                Сумма доставки:
+                            </div>
+                            <div class="col-6" style="color: black; font-weight: 500;">
+                                {{orderDeliverySumm | number:'':'fr'}} тг.
+                            </div>
+                        </div>                                                    
+                    </div>
+                    <div class="col-2" >
+    
+                    </div>                              
+                </div>    
+                <div class="row" style="padding-left: 20px;">
+                    <div class="col-10" >
+                        <div class="row">
+                            <div class="col-6" >
+                                Статус заказа:
+                            </div>
+                            <div class="col-6" style="color: black; font-weight: 500;">
+                                {{userOrderStatusValue}}
+                            </div>
+                        </div>                                                    
+                    </div>
+                    <div class="col-2" >
+    
+                    </div>                              
+                </div>                                                                          
+    
+            </div> 
+            <div class="orderWarsContainerWithoutCancelled">
+                <div class="row orderWars" *ngFor="let orderProduct of userOrderWars">
+                    <div class="col-2 basketImgDiv" (click)="goToProductDetails(orderProduct.productEntity.productCode)">
+                        <img src={{orderProduct.productEntity.product_photos[0].fileUrl}}  alt={{orderProduct.productEntity.productNameRus}} title={{orderProduct.productEntity.productNameRus}} style="height: 7vh; padding-top: 5px;">
+                    </div>
+                    <div class="col-6">
+                        <div class="basketProductName" style="padding-top: 5px;">{{orderProduct.productEntity.productNameRus}}&nbsp; - &nbsp; <b>{{orderProduct.productCount}}&nbsp;{{orderProduct.productEntity.product_unit.productUnitRusName}}</b></div>                    
+                    </div>     
+                    <div class="col-3">
+                        <div class="basketProductTotalSumm">
+                            {{orderProduct.productSumm | number:'':'fr'}} тг.
+                        </div>
+                        <div class="basketProductPrice">
+                            {{orderProduct.productPrise | number:'':'fr'}} тг/{{orderProduct.productEntity.product_unit.productUnitRusName}}.
+                        </div>            
+                    </div>
+                    <div class="col-1">                
+                    </div>
+                </div>          
+            </div>                      
+        </ng-template>
+    </ng-template>
 </div>

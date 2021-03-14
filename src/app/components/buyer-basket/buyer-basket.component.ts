@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute} from '@angular/router';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { Basket } from 'src/app/models/basket';
@@ -18,7 +18,7 @@ declare var $: any;
   styleUrls: ['./buyer-basket.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class BuyerBasketComponent implements OnInit {
+export class BuyerBasketComponent implements OnInit, AfterViewInit {
 
   faPlus = faPlus;
   faMinus = faMinus;
@@ -28,10 +28,12 @@ export class BuyerBasketComponent implements OnInit {
   buyerVerifyModel: BuyerVerify = new BuyerVerify();
   isSendOrder: boolean = false;
   isSlectedDeliveryAddress: boolean = false;
+  isSlectedDwhAddress: boolean = false;
   methodDelvery: number = 0;
   deliveryAddressId: number = 0;
   userDeliveryAddressList: any;
   selectedDeliveryAddress: any;
+  dwhAddress: any;
   errTxt: string;
   buyerOrderData: any;
   udaID: number = 0;
@@ -39,25 +41,45 @@ export class BuyerBasketComponent implements OnInit {
   constructor(private activateRoute: ActivatedRoute, private router: Router, private http: HttpClient, private spinner: NgxSpinnerService, private onlineStoreService: OnlineStoreService) { }
 
   ngOnInit(): void {    
-    this.basketModel = this.onlineStoreService.getBasketModel();    
-    console.log("test:" + JSON.stringify(this.basketModel));
 
+    /*if (localStorage.getItem("buyerBasketModel") != ""){
+      this.basketModel = JSON.parse(localStorage.getItem("buyerBasketModel"));      
+    }     
+    else {
+      this.basketModel = this.onlineStoreService.getBasketModel();        
+    }    */
 
-    this.onlineStoreService.goToClearBasket(false);
-    if (!this.basketModel?.basketProducts){
-      this.onlineStoreService.goToClearBasket(false);
-    }
+    this.basketModel = this.onlineStoreService.getBasketModel();        
 
-    if (this.basketModel.basketProducts != null){
-      if (this.basketModel.basketProducts.length == 0){
-        this.onlineStoreService.goToClearBasket(false);
+  }
+
+  ngAfterViewInit(): void{        
+
+    this.basketModel = this.onlineStoreService.getBasketModel();        
+    //console.log("this.basketModel: " + JSON.stringify(this.basketModel))    
+
+    if ((localStorage.getItem("buyerBasketModel") != null) && (localStorage.getItem("buyerBasketModel") != "") && (localStorage.getItem("buyerBasketModel") != "null")) {
+      this.basketModel = JSON.parse(localStorage.getItem("buyerBasketModel"));            
+      console.log("this.basketModel123: " + JSON.stringify(this.basketModel))  
+      this.onlineStoreService.setBasketModel(this.basketModel);
+    }               
+
+    if (this.basketModel?.basketProducts){      
+      if (this.basketModel.basketProducts.length == 0){        
+        this.onlineStoreService.goToClearBasket(false);        
       }            
+      else {        
+        this.onlineStoreService.goToClearBasket(true);        
+      }
+    }
+    else {      
+      this.onlineStoreService.goToClearBasket(false);
     }
 
     this.onlineStoreService.isSendOrder$.subscribe(senderOrder => {        
       this.isSendOrder = senderOrder;
     })    
-
+    
   }
 
   delBasketThisProduct(item: any) {                  
@@ -88,7 +110,7 @@ export class BuyerBasketComponent implements OnInit {
 
     this.basketModel = this.onlineStoreService.getBasketModel();
 
-    console.log("this.basketModel: " + JSON.stringify(this.basketModel))
+    //console.log("this.basketModel: " + JSON.stringify(this.basketModel))
 
   }
 
@@ -115,6 +137,7 @@ export class BuyerBasketComponent implements OnInit {
     this.onlineStoreService.goToClearBasket(false);
     this.onlineStoreService.goToBasketList(true);
     this.getUserDeliveryAddresses();
+    this.getFullDwhAddress("00-000001");
   }
 
   finishSendOrder(){
@@ -131,6 +154,14 @@ export class BuyerBasketComponent implements OnInit {
       }
     }
 
+    let varEmail = this.basketModel.buyerModel.eMail;
+
+    if ((varEmail == "") || (varEmail == null) || (varEmail == undefined)){    
+      this.showGritterNotify( "error", "Необходимо пройти процедуру авторизации покупателя в профиле пользователя. Без авторизации оформление заказа невозможно!");
+      this.spinner.hide();
+      return;
+    }
+
     this.spinner.show();  
     
     this.basketModel.deliveryType = this.methodDelvery;
@@ -141,7 +172,7 @@ export class BuyerBasketComponent implements OnInit {
       this.basketModel.totalSumm = this.basketModel.productsTotalSumm;
       this.basketModel.deliveryFullAddress = "";
       this.basketModel.deliveryAddressId = 0;
-      this.basketModel.deliveryType = this.methodDelvery;
+      this.basketModel.deliveryType = this.methodDelvery;      
     }
     else if (this.methodDelvery == 2) {
       this.basketModel.deliverySumm = 500;
@@ -153,8 +184,9 @@ export class BuyerBasketComponent implements OnInit {
 
     let saveBuyerOrderUrl = environment.onlineStoreOrderServiceUrl + 'saveBuyerOrder'; 
     this.http.post<any>(saveBuyerOrderUrl, this.basketModel
-    ).subscribe((data:any) => { 
+    ).subscribe((data:any) => {       
       this.buyerOrderData = data; 
+      console.log("this.basketModel: " + JSON.stringify(this.basketModel));
       console.log("this.buyerOrderData: " + JSON.stringify(this.buyerOrderData));
       if ((this.buyerOrderData.errCode != null) && (this.buyerOrderData.errCode == 0)){        
         this.spinner.hide();
@@ -203,6 +235,7 @@ export class BuyerBasketComponent implements OnInit {
     {
       this.selectedDeliveryAddress=data;   
       this.isSlectedDeliveryAddress = true;          
+      this.isSlectedDwhAddress = false;
 
       this.spinner.hide();
     },
@@ -216,12 +249,34 @@ export class BuyerBasketComponent implements OnInit {
 
   }
 
+  getFullDwhAddress(dwhCode){
+    this.basketModel.deliverySumm = 500;    
+
+    let buterDataUrl = environment.onlineStoreNsiServiceUrl + 'getDwhDatasByCode?dwhCode=' + dwhCode;
+    this.http.get(buterDataUrl).subscribe((data:any) => 
+    {
+      this.dwhAddress=data;   
+      //this.isSlectedDeliveryAddress = false;          
+      //this.isSlectedDwhAddress = true;      
+
+      this.spinner.hide();
+    },
+    error => 
+    {
+      this.errTxt=error;      
+      console.log("this.errTxt: " + JSON.stringify(this.errTxt));
+      this.showGritterNotify( "error", "Ошибка при получении данных адреса магазина");
+      this.spinner.hide();      
+    }) 
+
+  }  
+
   getUserDeliveryAddresses(){ 
     this.spinner.show(); 
     let varEmail = this.basketModel.buyerModel.eMail;
 
     if ((varEmail == "") || (varEmail == null) || (varEmail == undefined)){    
-      this.showGritterNotify( "error", "Пожалуйста, заполните электронную почту.");
+      this.showGritterNotify( "error", "Необходимо пройти процедуру авторизации покупателя в профиле пользователя. Без авторизации оформление заказа невозможно!");
       this.spinner.hide();
       return;
     }
@@ -247,6 +302,14 @@ export class BuyerBasketComponent implements OnInit {
     this.basketModel.deliverySumm = 0;    
     this.deliveryAddressId = 0;
     this.isSlectedDeliveryAddress = false;
+
+    if (this.methodDelvery != 1) {              
+      this.isSlectedDwhAddress = true;      
+    }
+    else {
+      this.isSlectedDwhAddress = false;      
+    }
+    
   }
 
   public showGritterNotify(type: string, message: string){

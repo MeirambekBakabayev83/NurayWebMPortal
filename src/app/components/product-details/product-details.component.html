@@ -16,12 +16,20 @@
                     </div>       
                     <div *ngIf="buyerVerifyModel?.isEmployees==1; then employeesBlock else notEmployeesBlock"></div> 
                     <ng-template #employeesBlock>    
-                      <div class="productDetailPriceDiv">
+                      <!--<div class="productDetailPriceDiv">
                         Розн. &nbsp;{{selectedProductData.productRetailPrice | number:'':'fr'}} т.
                       </div>   
                       <div class="productDetailBulkPriceDiv">
                         Опт. &nbsp;&nbsp;{{selectedProductData.productBulkPrice | number:'':'fr'}} т.
-                      </div>   
+                      </div>   -->
+                      <div class="row" style="padding-left: 15px;">
+                        <div class="col-6 productDetailPriceDiv">
+                          Розн: {{selectedProductData.productRetailPrice | number:'':'fr'}} т.
+                        </div>
+                        <div class="col-6 productDetailBulkPriceDiv">
+                          Опт: {{selectedProductData.productBulkPrice | number:'':'fr'}} т.
+                        </div>                 
+                      </div>                                 
                     </ng-template>                      
                     <ng-template #notEmployeesBlock>    
                       <div *ngIf="buyerVerifyModel?.isPartners==1; then partnersBlock else notPartnersBlock"></div>

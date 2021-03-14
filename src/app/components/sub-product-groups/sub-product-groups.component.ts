@@ -73,7 +73,7 @@ export class SubProductGroupsComponent implements OnInit, AfterViewInit {
   addBasket(item: any){
     this.onlineStoreService.fillBasketModel(item);          
     item.viewBasket =true;    
-    console.log(JSON.stringify(item))
+    //console.log(JSON.stringify(item))
   }
 
   addBasketThisProduct(item: any) {
@@ -109,12 +109,31 @@ export class SubProductGroupsComponent implements OnInit, AfterViewInit {
       this.productGroups=data;       
       if (localStorage.getItem("selectedProductGroupId")){
         this.selectedProductGroupId = parseInt(localStorage.getItem("selectedProductGroupId"));
-        this.subGroupProducts = this.productGroups.find(x => x.productGroupId == this.selectedProductGroupId).products;    
+        //this.subGroupProducts = this.productGroups.find(x => x.productGroupId == this.selectedProductGroupId).products;    
       }    
       else {
-        this.subGroupProducts = this.productGroups[0].products;     
+        //this.subGroupProducts = this.productGroups[0].products;     
         this.selectedProductGroupId = this.productGroups[0].productGroupId;
       }        
+
+      // Получаем список продуктов (Начало)
+
+      productGroupListUrl = environment.onlineStoreNsiServiceUrl + 'getSubProductsModel?productGroupId=' + this.selectedProductGroupId;
+
+      this.http.get(productGroupListUrl).subscribe((data:any) => 
+      {
+        this.spinner.show();
+        this.subGroupProducts=data;               
+        this.spinner.hide(); 
+      },
+      error => 
+      {
+        this.errTxt=error;              
+        this.showGritterNotify( "error", "Ошибка при получении списка товаров выбранной группы");
+        this.spinner.hide();      
+      })
+
+      // Получаем список продуктов (Конец)      
   
       this.basketModel = this.onlineStoreService.getBasketModel();
       
@@ -145,11 +164,31 @@ export class SubProductGroupsComponent implements OnInit, AfterViewInit {
 
   getListSubProducts(productGroupID){
     //alert(productGroupID);
-    this.subGroupProducts = this.productGroups.find(x => x.productGroupId == productGroupID).products;
+    //this.subGroupProducts = this.productGroups.find(x => x.productGroupId == productGroupID).products;
+    this.spinner.show(); 
     this.selectedProductGroupId = productGroupID;
+
+      // Получаем список продуктов (Начало)
+
+      let productGroupListUrl = environment.onlineStoreNsiServiceUrl + 'getSubProductsModel?productGroupId=' + this.selectedProductGroupId;
+
+      this.http.get(productGroupListUrl).subscribe((data:any) => 
+      {
+        this.subGroupProducts=data;               
+        this.spinner.hide(); 
+      },
+      error => 
+      {
+        this.errTxt=error;              
+        this.showGritterNotify( "error", "Ошибка при получении списка товаров выбранной группы");
+        this.spinner.hide();      
+      })
+
+      // Получаем список продуктов (Конец)          
+
     localStorage.setItem("selectedProductGroupId", productGroupID);
 
-    console.log("this.selectedProductGroupId: " + this.selectedProductGroupId) ;
+    //console.log("this.selectedProductGroupId: " + this.selectedProductGroupId) ;
   }
 
   goToProductDetails(productCode){

@@ -11,9 +11,18 @@
     </div>
     <ng-template #notViewOrderCommand>
       <div class="basketOrderSumm">
-        <div class="row" style="padding-left: 20px;">
-          Сумма покупки: {{basketModel.productsTotalSumm | number:'':'fr'}} тг.
-        </div>                    
+        <div *ngIf="basketModel.productsTotalSumm != 0 && basketModel.productsTotalSumm != null; then viewOrderSumm else notViewOrderSumm">
+        </div>
+        <ng-template #viewOrderSumm>
+          <div class="row" style="padding-left: 20px;">
+            Сумма покупки: {{basketModel.productsTotalSumm | number:'':'fr'}} тг.
+          </div>                    
+        </ng-template>        
+        <ng-template #notViewOrderSumm>
+          <div class="row" style="padding-left: 20px;">
+            Сумма покупки: 0 тг.
+          </div>                    
+        </ng-template>
         <div class="row" style="text-align: center; padding: 0 10px; position: relative;">
           <div class="col-12">
             <button id="btnSendOrder" class="btn btn-primary" style="width: 100%;" (click)="sendOrder()">Оформить заказ</button>
@@ -93,6 +102,13 @@
               </mat-radio-group>
             </fieldset>                   
           </div>                   
+        </div>
+        <div class="row" style="padding-left: 20px; margin-top: 5px;" *ngIf="methodDelvery == 1">             
+          <div class="col-12">
+            <div class="selectedDeliveryAddress" *ngIf="isSlectedDwhAddress == true">
+              Адрес магазина: {{dwhAddress.dwhListRusAddress}}
+            </div>                                  
+          </div>
         </div>
         <div class="row" style="padding-left: 20px; margin-top: 5px;" *ngIf="methodDelvery == 2">             
           <div class="col-12">

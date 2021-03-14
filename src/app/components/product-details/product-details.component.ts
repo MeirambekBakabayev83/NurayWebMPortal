@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Router, ActivatedRoute} from '@angular/router';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { OnlineStoreService } from 'src/app/services/online-store.service';
@@ -25,6 +25,8 @@ export class ProductDetailsComponent implements OnInit {
   faMinus = faMinus;
   faHome = faHome;
 
+  private sub: any;
+
   productCode: string;
   selectedProductData: any;
   errTxt: string;
@@ -33,10 +35,10 @@ export class ProductDetailsComponent implements OnInit {
   buyerVerifyModel: BuyerVerify = new BuyerVerify();
 
   constructor(private activateRoute: ActivatedRoute, private router: Router, private http: HttpClient, private spinner: NgxSpinnerService, private onlineStoreService: OnlineStoreService) {
-    this.productCode = this.activateRoute.snapshot.params['productCode'];            
+    this.productCode = this.activateRoute.snapshot.params['productCode'];        
   }
 
-  ngOnInit(): void {        
+  ngOnInit(): void {            
 
     this.basketModel = this.onlineStoreService.getBasketModel();
 
@@ -44,6 +46,13 @@ export class ProductDetailsComponent implements OnInit {
 
     this.buyerVerifyModel = this.onlineStoreService.getBuyerVerifyModel();
     
+  }
+
+  ngAfterViewInit(): void{
+    this.sub = this.activateRoute.params.subscribe(params => {
+      this.productCode = params['productCode'];
+      this.getProductGroupList();
+    });    
   }
 
   getProductGroupList(){

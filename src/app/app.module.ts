@@ -40,6 +40,8 @@ import { SubProductGroupsComponent } from './components/sub-product-groups/sub-p
 import { ProductDetailsComponent } from './components/product-details/product-details.component';
 import { LeftNavMenuComponent } from './components/left-nav-menu/left-nav-menu.component';
 import { BuyerSettingsComponent } from './components/buyer-settings/buyer-settings.component'; 
+import { BarcodeScannerLivestreamModule } from "ngx-barcode-scanner";
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
 
 polyfill();
 enableProdMode();
@@ -95,6 +97,8 @@ const maskConfig: Partial<IConfig> = {
     MatNativeDateModule,
     MatMomentDateModule,
     MatRadioModule,    
+    BarcodeScannerLivestreamModule,
+    ZXingScannerModule,
     NgxMaskModule.forRoot(maskConfig)
   ],
   providers: [AppGuard],

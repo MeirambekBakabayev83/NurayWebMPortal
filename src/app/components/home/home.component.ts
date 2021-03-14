@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Router} from '@angular/router';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { OnlineStoreService } from 'src/app/services/online-store.service';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { Subject } from 'rxjs';
@@ -20,7 +20,7 @@ declare var $: any;
   styleUrls: ['./home.component.css'],  
   encapsulation: ViewEncapsulation.None
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
 
   customOptions: OwlOptions = {
     loop: false,    
@@ -54,11 +54,12 @@ export class HomeComponent implements OnInit {
   faMinus = faMinus;
   faHome = faHome;
 
-  constructor(private onlineStoreService: OnlineStoreService, private http: HttpClient, private spinner: NgxSpinnerService, private router: Router) { }
+  constructor(private onlineStoreService: OnlineStoreService, private http: HttpClient, private spinner: NgxSpinnerService, private router: Router) { 
+  }
 
   ngOnInit(): void {    
 
-    this.getProductGroupList();
+    //this.getProductGroupList();
     this.onlineStoreService.goToClearBasket(false);
     this.onlineStoreService.goToBasketList(false);
 
@@ -70,8 +71,12 @@ export class HomeComponent implements OnInit {
       this.buyerVerifyModel = this.onlineStoreService.getBuyerVerifyModel();      
     }    
 
-    console.log("this.buyerVerifyModel: " + JSON.stringify(this.buyerVerifyModel));
+    //console.log("this.buyerVerifyModel: " + JSON.stringify(this.buyerVerifyModel));
         
+  }
+
+  ngAfterViewInit(): void{
+    this.getProductGroupList();
   }
 
   getProductGroupList(){
@@ -81,9 +86,13 @@ export class HomeComponent implements OnInit {
     {
       this.productGroups=data; 
 
-      this.basketModel = this.onlineStoreService.getBasketModel();
-      
+      this.basketModel = this.onlineStoreService.getBasketModel();      
 
+      if ((localStorage.getItem("buyerBasketModel") != null) || (localStorage.getItem("buyerBasketModel") != "")) {
+        this.basketModel = JSON.parse(localStorage.getItem("buyerBasketModel"));      
+        this.onlineStoreService.setBasketModel(this.basketModel);
+      }     
+      
       if (this.basketModel?.basketProducts){
         for (let i = 0; i < this.productGroups.length; i ++){
           for (let j = 0; j < this.productGroups[i].products.length; j ++){

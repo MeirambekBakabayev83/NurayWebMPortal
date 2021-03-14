@@ -1,7 +1,8 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, NgZone, ElementRef } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
+import {ActivatedRoute} from '@angular/router';
 import { ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RoutesRecognized } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { OnlineStoreService } from 'src/app/services/online-store.service';
 import { faHome, faBars, faShoppingBasket, faUser, faShoppingCart, faBackspace, faListUl } from '@fortawesome/free-solid-svg-icons';
@@ -11,6 +12,8 @@ import { NgxSpinnerService } from "ngx-spinner";
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LeftNavMenuComponent } from './components/left-nav-menu/left-nav-menu.component'; 
+import { Barcode, BarcodePicker, ScanSettings, configure } from "scandit-sdk";
+import { filter, pairwise } from 'rxjs/operators';
 declare var $: any;
 
 @Component({
@@ -19,15 +22,15 @@ declare var $: any;
   styleUrls: ['./app.component.css'],  
   encapsulation: ViewEncapsulation.None
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   title = 'NurayWebProject';
   isComBack: boolean = false;
   isClearBasket: boolean = false;
   isReturnBasketList: boolean = false;  
   routeName: string = "home";
-  warCode: string;
+  warCode: string = "";
 
-  basketModel: Basket = new Basket();
+  basketModel: Basket = new Basket();  
 
   faHome = faHome;
   faBars = faBars;
@@ -41,40 +44,60 @@ export class AppComponent implements OnInit {
   errTxt: string;
   modalRef: any; 
 
+  previousUrl: string;
+  currentUrl: string;
+
   buyerVerifyModel: BuyerVerify = new BuyerVerify();
 
-  constructor(updates:  SwUpdate, private router: Router, private modalService: NgbModal, private onlineStoreService: OnlineStoreService, private spinner: NgxSpinnerService, private http: HttpClient, private ngZone: NgZone) {    
+  constructor(updates:  SwUpdate, private route: ActivatedRoute, private router: Router, private modalService: NgbModal, private onlineStoreService: OnlineStoreService, private spinner: NgxSpinnerService, private http: HttpClient, private ngZone: NgZone, private elRef: ElementRef) {    
     updates.available.subscribe((event) => {
       updates.activateUpdate().then(() => document.location.reload());    
-    });        
+    });             
+
+    this.router.events
+    .pipe(filter((evt: any) => evt instanceof RoutesRecognized), pairwise())
+    .subscribe((events: RoutesRecognized[]) => {
+      console.log('previous url', events[0].url);
+      console.log('current url', events[1].url);
+
+      this.previousUrl = events[0].url;
+      this.currentUrl = events[1].url;
+    });
+    
   }
 
-  ngOnInit() {    
+  ngOnInit() {       
+
+    this.isClearBasket = false;    
+
+    //this.basketModel = this.onlineStoreService.getBasketModel();      
              
     this.onlineStoreService.isBasketUpd$.subscribe( basketModelFromService => {      
       this.basketModel = basketModelFromService;    
-      console.log("this.basketModel: " + JSON.stringify(this.basketModel));            
-    })            
+      //console.log("this.basketModel: " + JSON.stringify(this.basketModel));            
+    })      
 
     this.onlineStoreService.isReturnBack$.subscribe(routeName => {
       this.routeName = routeName;      
+      console.log("this.routeName: " + this.routeName);
       this.isComBack = true;
-    })    
-
-    this.onlineStoreService.isClearBasket$.subscribe(clearBasket => {        
-      this.isClearBasket = clearBasket;
     })    
 
     this.onlineStoreService.isReturnBasketList$.subscribe(returnBasketList => {        
       this.isReturnBasketList = returnBasketList;
     })    
 
-    if (localStorage.getItem("buyerLogin")){
+    this.onlineStoreService.isClearBasket$.subscribe(clearBasket => {        
+      this.isClearBasket = clearBasket;
+    })        
+
+    if ((localStorage.getItem("buyerLogin") != "") && (localStorage.getItem("buyerLogin") != null)){
       this.getUserDatas(localStorage.getItem("buyerLogin"));
     } 
     
+    
     //AutoSearch Products
-
+    
     let autoComlUrl = environment.onlineStoreNsiServiceUrl + "getSearchProducts";     
     let return_data = new Array();
 
@@ -94,7 +117,7 @@ export class AppComponent implements OnInit {
           data: {
             jsonpCallback : "p",
             "productSearchTxt": request.term
-          },                   
+          },               
           success: function( data ) {                              
             if (data != null) {     
               
@@ -104,7 +127,7 @@ export class AppComponent implements OnInit {
               
               for(var i=0; i< data.length; i++){
                 return_data.push({
-                  'label': data[i].product.productNameRus,
+                  'label': data[i].barCode + " - " + data[i].product.productNameRus,
                   'value': data[i].product.productCode,
                   'empObj': data[i]
                 })
@@ -135,8 +158,35 @@ export class AppComponent implements OnInit {
 
   }
 
+  ngAfterViewInit(): void {
+
+    this.basketModel = this.onlineStoreService.getBasketModel();      
+    //console.log("this.basketModel: " + JSON.stringify(this.basketModel))    
+
+    if ((localStorage.getItem("buyerBasketModel") != null) && (localStorage.getItem("buyerBasketModel") != "") && (localStorage.getItem("buyerBasketModel") != "null")) {
+      this.basketModel = JSON.parse(localStorage.getItem("buyerBasketModel"));            
+      //this.onlineStoreService.setBasketModel(this.basketModel);
+    }     
+    
+    /*if (this.basketModel == null){
+      this.basketModel.productsTotalCount = 0;
+      this.basketModel.productsTotalSumm = 0;
+      this.basketModel.deliverySumm = 0;
+      this.basketModel.deliveryType = 1;
+    } */ 
+
+    this.onlineStoreService.setBasketModel(this.basketModel);            
+  }
+
   setProductObj(productObj){
-    console.log("productObj: " + JSON.stringify(productObj));
+    this.warCode = "";    
+    
+    this.router.navigate(
+      ['/productDetails', productObj.value], 
+      {}
+    );    
+
+    this.onlineStoreService.goToReturn("home");
   }
 
   getUserDatas(userLogin){
@@ -145,7 +195,7 @@ export class AppComponent implements OnInit {
     this.http.get(productGroupListUrl).subscribe((data:any) => 
     {
       this.buyerData=data;       
-      console.log("this.buyerData: " + JSON.stringify(this.buyerData));
+      //console.log("this.buyerData: " + JSON.stringify(this.buyerData));
 
       if ((this.buyerData) && (this.buyerData.userId) && (this.buyerData.userId != null) && (this.buyerData.userId != 0)){
 
@@ -181,12 +231,22 @@ export class AppComponent implements OnInit {
   
   goHome() {
     this.router.navigate(["home"]);
+    this.isComBack = false;
   }
 
   goToBack(){
     if (this.routeName == "home"){
       this.isComBack = false;
     }
+    else if (this.routeName == "/home"){
+      this.isComBack = false;
+    }
+    else if (this.routeName == ""){
+      this.isComBack = false;
+    }
+    else if (this.routeName == undefined){
+      this.isComBack = false;
+    }    
     else {
       this.isComBack = true;
     }
@@ -198,17 +258,18 @@ export class AppComponent implements OnInit {
 
   goProductCategories() {
     this.router.navigate(["categoriesList"]);
+    this.routeName = "Home";        
+
+    this.onlineStoreService.goToReturn(this.routeName);
   }
 
   goBuyerBasket() {
     this.router.navigate(["buyerBasket"]);
 
-    this.routeName = "Home";    
-
-    this.routeName = this.router.url;
+    this.routeName = "Home";        
 
     this.onlineStoreService.goToReturn(this.routeName);
-    this.onlineStoreService.goToClearBasket(true);
+    //this.onlineStoreService.goToClearBasket(true);
   }
 
   goBuyerProfile() {
@@ -218,6 +279,7 @@ export class AppComponent implements OnInit {
   clearOrder(){
     this.onlineStoreService.clearBasketModel();
     this.basketModel = this.onlineStoreService.getBasketModel();
+    this.onlineStoreService.goToClearBasket(false);        
   }
 
   viewListBasket(){

@@ -41,6 +41,7 @@ export class OnlineStoreService {
     this.basketModel.productsTotalSumm = 0;
     this.basketModel.deliverySumm = 0;
     this.basketModel.totalSumm = 0;    
+    this.basketModel.basketProducts = [];
   }
 
   getProductgroupsList() : Observable<ProductGroups[]>{        
@@ -90,6 +91,9 @@ export class OnlineStoreService {
 
   fillBasketModel(productItem: any){          
 
+    //console.log("productItem1: " + JSON.stringify(productItem));
+    console.log("check basketModel: " + JSON.stringify(this.basketModel));
+
     let basketProducts = [];              
 
     let itemProductCount = 0;
@@ -110,23 +114,38 @@ export class OnlineStoreService {
     else{
       itemProductCount = 0.1;
       productItem.productCount = 0.1;
-    }    
+    }   
+    
+    if (this.basketModel == null) {
 
-    for (let basket in this.basketModel.basketProducts)
-    {
-      basketProducts.push(
-        {
-          "productId": this.basketModel.basketProducts[basket].productId,
-          "productCode": this.basketModel.basketProducts[basket].productCode,
-          "productPrice": this.basketModel.basketProducts[basket].productPrice,
-          "productCount": this.basketModel.basketProducts[basket].productCount,
-          "productSumm": this.basketModel.basketProducts[basket].productSumm,
-          "productName": this.basketModel.basketProducts[basket].productName,
-          "productPhotoUrl": this.basketModel.basketProducts[basket].productPhotoUrl,
-          "isWeight": this.basketModel.basketProducts[basket].isWeight,
-          "productUnitName": this.basketModel.basketProducts[basket].productUnitName
-        }
-      );      
+      let localBasketModel: Basket = new Basket();
+
+      localBasketModel.productsTotalCount = 0;
+      localBasketModel.productsTotalSumm = 0;
+      localBasketModel.deliverySumm = 0;
+      localBasketModel.totalSumm = 0;    
+      localBasketModel.basketProducts = [];      
+
+      this.basketModel = localBasketModel;      
+    }
+
+    if (this.basketModel?.basketProducts) {
+      for (let basket in this.basketModel?.basketProducts)
+      {
+        basketProducts.push(
+          {
+            "productId": this.basketModel.basketProducts[basket].productId,
+            "productCode": this.basketModel.basketProducts[basket].productCode,
+            "productPrice": this.basketModel.basketProducts[basket].productPrice,
+            "productCount": this.basketModel.basketProducts[basket].productCount,
+            "productSumm": this.basketModel.basketProducts[basket].productSumm,
+            "productName": this.basketModel.basketProducts[basket].productName,
+            "productPhotoUrl": this.basketModel.basketProducts[basket].productPhotoUrl,
+            "isWeight": this.basketModel.basketProducts[basket].isWeight,
+            "productUnitName": this.basketModel.basketProducts[basket].productUnitName
+          }
+        );      
+      }
     }
 
     basketProducts.push(
@@ -135,13 +154,14 @@ export class OnlineStoreService {
         "productCode": productItem.productCode,
         "productPrice": itemProductPrise,
         "productCount": itemProductCount,
-        "productSumm": (productItem.productRetailPrice ? itemProductCount * itemProductPrise : itemProductCount * productItem.productPrice),
+        //"productSumm": (productItem.productRetailPrice ? itemProductCount * itemProductPrise : itemProductCount * productItem.productPrice),
+        "productSumm": itemProductCount * itemProductPrise,
         "productName": productItem.productNameRus,
         "productPhotoUrl": productItem.productPhotoUrl,
         "isWeight": productItem.isWeight,
         "productUnitName": productItem.productUnitName
       }
-    );    
+    );          
 
     this.basketModel.basketProducts = basketProducts;                
 
@@ -158,6 +178,10 @@ export class OnlineStoreService {
     this.basketModel.productsTotalSumm = productsTotalSumm;
 
     this.isBasketUpd.next(this.basketModel);
+
+    console.log("check: " + JSON.stringify(this.basketModel))    
+
+    localStorage.setItem("buyerBasketModel", JSON.stringify(this.basketModel));  
   }
 
   addCorrectItemBasketModel(productItem: any){              
@@ -167,24 +191,28 @@ export class OnlineStoreService {
     let itemProductPrise = 0;
 
     if (this.buyerVerifyModel.isPartners == 1){
-      itemProductPrise = productItem.productBulkPrice;
+      itemProductPrise = productItem.productBulkPrice;      
     }
     else {
-      itemProductPrise = productItem.productRetailPrice;
+      itemProductPrise = productItem.productRetailPrice;      
+    }    
+
+    if ((itemProductPrise == null) || (itemProductPrise == undefined)){
+      itemProductPrise = productItem.productPrice;
     }
+               
 
-    index = this.basketModel.basketProducts.findIndex(function (element) { 
+    index = this.basketModel?.basketProducts.findIndex(function (element) { 
       return element.productId == productItem.productId; 
-    });
-
-    console.log("index: " + index)
+    });    
 
     if (index !== -1) {
       this.basketModel.basketProducts[index].productId = productItem.productId;
       this.basketModel.basketProducts[index].productCount = Number(productItem.productCount.toFixed(1));
       //this.basketModel.basketProducts[index].productPrice = productItem.productRetailPrice;          
-      this.basketModel.basketProducts[index].productPrice = (productItem.productRetailPrice ? itemProductPrise: productItem.productPrice); 
-      this.basketModel.basketProducts[index].productSumm = (productItem.productRetailPrice ? productItem.productCount * itemProductPrise : productItem.productCount * productItem.productPrice);          
+      this.basketModel.basketProducts[index].productPrice = itemProductPrise
+      //this.basketModel.basketProducts[index].productSumm = (productItem.productRetailPrice ? productItem.productCount * itemProductPrise : productItem.productCount * productItem.productPrice);          
+      this.basketModel.basketProducts[index].productSumm = productItem.productCount * itemProductPrise
       this.basketModel.basketProducts[index].productName = (productItem.productNameRus ? productItem.productNameRus : productItem.productName);          
     }                                         
 
@@ -199,6 +227,10 @@ export class OnlineStoreService {
     this.basketModel.productsTotalSumm = productsTotalSumm;
 
     this.isBasketUpd.next(this.basketModel);
+
+    //console.log("this.basketModel: " + JSON.stringify(this.basketModel))
+
+    localStorage.setItem("buyerBasketModel", JSON.stringify(this.basketModel));  
   }  
 
   delCorrectItemBasketModel(productItem: any, minusProductCount: number){              
@@ -214,32 +246,39 @@ export class OnlineStoreService {
       itemProductPrise = productItem.productRetailPrice;
     }
 
-    index = this.basketModel.basketProducts.findIndex(function (element) { 
+    if ((itemProductPrise == null) || (itemProductPrise == undefined)){
+      itemProductPrise = productItem.productPrice;
+    }    
+
+    productItem.productCount = productItem.productCount - minusProductCount
+
+    index = this.basketModel?.basketProducts.findIndex(function (element) { 
       return element.productId == productItem.productId; 
     });
 
     if (index !== -1) {
       this.basketModel.basketProducts[index].productId = productItem.productId;
-      this.basketModel.basketProducts[index].productCount = Number((this.basketModel.basketProducts[index].productCount - minusProductCount).toFixed(1));
-      this.basketModel.basketProducts[index].productPrice = (productItem.productRetailPrice ? itemProductPrise: productItem.productPrice); 
+      this.basketModel.basketProducts[index].productCount = Number(productItem.productCount.toFixed(1));
+      //this.basketModel.basketProducts[index].productPrice = (productItem.productRetailPrice ? itemProductPrise: productItem.productPrice); 
+      this.basketModel.basketProducts[index].productPrice = itemProductPrise; 
       //this.basketModel.basketProducts[index].productSumm = Number((this.basketModel.basketProducts[index].productCount * productItem.productRetailPrice).toFixed(2));                   
-      this.basketModel.basketProducts[index].productSumm = (productItem.productRetailPrice ? productItem.productCount * itemProductPrise : productItem.productCount * productItem.productPrice);
+      this.basketModel.basketProducts[index].productSumm = productItem.productCount * itemProductPrise;
       this.basketModel.basketProducts[index].productName = (productItem.productNameRus ? productItem.productNameRus : productItem.productName);          
-      productItem.productCount = this.basketModel.basketProducts[index].productCount;
+      //productItem.productCount = this.basketModel.basketProducts[index].productCount;
       
     }
 
     if (productItem.isWeight == 0) {
-      if (this.basketModel.basketProducts[index].productCount == 0){
-        this.basketModel.basketProducts.splice(index, 1);
+      if (this.basketModel?.basketProducts[index].productCount == 0){
+        this.basketModel?.basketProducts.splice(index, 1);
         this.basketModel.productsTotalCount = this.basketModel.productsTotalCount - 1;
 
         productItem.viewBasket = false;
       }
     }  
     else {
-      if (this.basketModel.basketProducts[index].productCount < 0.1){
-        this.basketModel.basketProducts.splice(index, 1);
+      if (this.basketModel?.basketProducts[index].productCount < 0.1){
+        this.basketModel?.basketProducts.splice(index, 1);
         this.basketModel.productsTotalCount = this.basketModel.productsTotalCount - 1;
         productItem.viewBasket = false;
       }      
@@ -256,13 +295,15 @@ export class OnlineStoreService {
     this.basketModel.productsTotalSumm = productsTotalSumm;        
 
     this.isBasketUpd.next(this.basketModel);
+
+    localStorage.setItem("buyerBasketModel", JSON.stringify(this.basketModel));  
   } 
 
   delItemBasketModel(productItem: any){              
 
     let index = null;    
 
-    index = this.basketModel.basketProducts.findIndex(function (element) { 
+    index = this.basketModel?.basketProducts.findIndex(function (element) { 
       return element.productId == productItem.productId; 
     });
 
@@ -272,7 +313,7 @@ export class OnlineStoreService {
     }    
 
     let productsTotalSumm = 0;
-    for (let basket in this.basketModel.basketProducts)
+    for (let basket in this.basketModel?.basketProducts)
     {
       productsTotalSumm = productsTotalSumm + (this.basketModel.basketProducts[basket].productCount * this.basketModel.basketProducts[basket].productPrice);
     }
@@ -282,17 +323,25 @@ export class OnlineStoreService {
     this.basketModel.productsTotalSumm = productsTotalSumm;        
 
     this.isBasketUpd.next(this.basketModel);
+
+    localStorage.setItem("buyerBasketModel", JSON.stringify(this.basketModel));  
+
   } 
 
   clearBasketModel(){
     this.basketModel.productsTotalSumm = 0;        
     this.basketModel.productsTotalCount = 0;
+    this.basketModel.deliverySumm = 0;
+    this.basketModel.totalSumm = 0;
 
-    while(this.basketModel.basketProducts.length > 0) {
+    while(this.basketModel?.basketProducts.length > 0) {
       this.basketModel.basketProducts.pop();
     }      
+    
 
     this.isBasketUpd.next(this.basketModel);
+
+    localStorage.setItem("buyerBasketModel", JSON.stringify(this.basketModel));  
   }
   
   setBuyerVerify(_buyerVerify: BuyerVerify){
@@ -309,11 +358,26 @@ export class OnlineStoreService {
   }
 
   getBasketModel(){
+
+    if (this.basketModel == null) {
+
+      let localBasketModel: Basket = new Basket();
+
+      localBasketModel.productsTotalCount = 0;
+      localBasketModel.productsTotalSumm = 0;
+      localBasketModel.deliverySumm = 0;
+      localBasketModel.totalSumm = 0;    
+      localBasketModel.basketProducts = [];      
+
+      this.basketModel = localBasketModel;
+    }    
+
     return this.basketModel;
   }
 
   setBasketModel(basketData: Basket){
     this.basketModel = basketData;
+    //this.isBasketUpd.next(basketData);
   }
 
 }
